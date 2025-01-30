@@ -23,12 +23,12 @@ def svm_loss(W, X, y, reg):
     '''
     Structured SVM loss function, naive implementation (with loops).
 
-    Inputs have dimension D+1, there are C classes, 
+    Inputs have dimension D, there are C classes, 
     and we operate on minibatches of N examples.
 
     Inputs:
     - W: A numpy array of shape (D+1, C) containing weights.
-    - X: A numpy array of shape (N, D+1) containing a minibatch of data.
+    - X: A numpy array of shape (N, D) containing a minibatch of data.
     - y: A numpy array of shape (N,) containing training labels; y[i] = c means
       that X[i] has label c, where 0 <= c < C.
     - reg: (float) regularization strength
@@ -43,16 +43,21 @@ def svm_loss(W, X, y, reg):
     loss = 0.0
     dW = np.zeros(W.shape)  # initialize the gradient as zero
 
-    N = len(y)     # number of samples
-    Y_hat = X @ W  # raw scores matrix
+    num_train = X.shape[0]
+    scores = X.dot(W)
+    correct_class_scores = scores[ np.arange(num_train), y].reshape(num_train,1)
+    margin = np.maximum(0.0, scores - correct_class_scores + 1.0)
+    margin[ np.arange(num_train), y] = 0.0 # do not consider correct class in loss
+    loss = margin.sum() / num_train + reg * np.sum(W * W)
 
-    y_hat_true = Y_hat[range(N), y][:, np.newaxis]    # scores for true labels
-    margins = np.maximum(0, Y_hat - y_hat_true + 1)   # margin for each score
-    loss = margins.sum() / N - 1 + reg * np.sum(W**2) # regularized loss
+    # Compute gradient
+    margin[margin > 0.0] = 1.0
+    valid_margin_count = margin.sum(axis=1)
+    # Subtract in correct class (-s_y)
+    margin[np.arange(num_train), y] -= valid_margin_count
+    dW = (X.T).dot(margin) / num_train
 
-    # Gradeint of the loss functoin 
-    dW = (margins > 0).astype(int)    # initial gradient with respect to Y_hat
-    dW[range(N), y] -= dW.sum(axis=1) # update gradient to include correct labels
-    dW = X.T @ dW / N + 2 * reg * W   # gradient with respect to W
+    # Regularization gradient
+    dW = dW + 2.0 * reg * W
 
     return loss, dW
