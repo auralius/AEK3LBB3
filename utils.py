@@ -36,6 +36,10 @@ def svm_loss(W, X, y, reg):
     Returns a tuple of:
     - loss as single float
     - gradient with respect to weights W; an array of same shape as W
+
+    References:
+    - https://github.com/mantasu/cs231n
+    - https://github.com/jariasf/CS231n
     '''
 
     X  = np.hstack((X, np.ones((X.shape[0],1)))) # the last column is 1: to allow augmentation of bias vector into W
