@@ -60,12 +60,21 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="principle-component-analysis">
 <h1>Principle Component Analysis<a class="headerlink" href="#principle-component-analysis" title="Link to this heading">¶</a></h1>
+<p>This document is based on: <a class="reference external" href="https://bagheri365.github.io/blog/Principal-Component-Analysis-from-Scratch/">Principal Component Analysis from Scratch</a></p>
+<p>There are some differences:</p>
+<ul class="simple">
+<li><p>svd decomposition of the covariance matrix is used instead of the Eigen decomposition. Thus, the Eigen value and vector pairs are always in non-ascending order.</p></li>
+<li><p>Eigen value correction is an optional step which is needed to obtain identical results with scikit-learn.</p></li>
+</ul>
+<section id="what-is-pca">
+<h2>What is PCA?<a class="headerlink" href="#what-is-pca" title="Link to this heading">¶</a></h2>
 <p>Greenacre, M., Groenen, P.J.F., Hastie, T. et al. Principal component analysis. Nat Rev Methods Primers 2, 100 (2022):</p>
 <ul class="simple">
 <li><p>PCA reduces a cases-by-variables data table to its essential features, called principal components.</p></li>
 <li><p>Principal components are a few linear combinations of the original variables that maximally explain the variance of all the variables.</p></li>
 <li><p>The method provides an approximation of the original data table using only these few major components.</p></li>
 </ul>
+</section>
 <section id="preparations">
 <h2>Preparations<a class="headerlink" href="#preparations" title="Link to this heading">¶</a></h2>
 <div class="cell docutils container">
@@ -76,7 +85,7 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
     <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;Times&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
 <span class="p">})</span>
 </pre></div>
 </div>
@@ -142,7 +151,7 @@ Labels          : [0 1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/cebae9b6bdeb087898d87f27ce684ac38ef97ac4b377d89958e0ff35b9cc4c81.png" src="_images/cebae9b6bdeb087898d87f27ce684ac38ef97ac4b377d89958e0ff35b9cc4c81.png" />
+<img alt="_images/8b369481927b03d99860f8462ab96353caf3bffa2694f29a6770fdc7ecce9174.png" src="_images/8b369481927b03d99860f8462ab96353caf3bffa2694f29a6770fdc7ecce9174.png" />
 </div>
 </div>
 <section id="standardization">
@@ -182,7 +191,7 @@ Labels          : [0 1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/d4392c8387c15c13d178c305040bfbb4abac864a0ccae0540ea79e20c174ca9d.png" src="_images/d4392c8387c15c13d178c305040bfbb4abac864a0ccae0540ea79e20c174ca9d.png" />
+<img alt="_images/0273fd64fc9bf40659a51c11ea1ef6b6e4771a254b2e9fc7f2c7f2838a721241.png" src="_images/0273fd64fc9bf40659a51c11ea1ef6b6e4771a254b2e9fc7f2c7f2838a721241.png" />
 </div>
 </div>
 </section>
@@ -190,7 +199,16 @@ Labels          : [0 1 2]
 <h3>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cov_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X_std</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="c1"># symmetric matrix</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cov_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X_std</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="c1"># square symmetric, positive semi-definite</span>
+<span class="n">cov_mat</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1.00671194, -0.11010332,  0.87760527,  0.82344337],
+       [-0.11010332,  1.00671113, -0.4233384 , -0.35893692],
+       [ 0.87760527, -0.4233384 ,  1.00671182,  0.96921862],
+       [ 0.82344337, -0.35893692,  0.96921862,  1.00671115]])
 </pre></div>
 </div>
 </div>
@@ -198,6 +216,7 @@ Labels          : [0 1 2]
 </section>
 <section id="singular-value-decompostion">
 <h3>Singular Value Decompostion<a class="headerlink" href="#singular-value-decompostion" title="Link to this heading">¶</a></h3>
+<p>For square symmetric positive semi-definite matrix (such as covariance matrix), eigenvalue and singular value decompositions are exactly the same.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
@@ -225,7 +244,7 @@ Labels          : [0 1 2]
 <p>Correct the Eigen matrix such that:</p>
 <ul class="simple">
 <li><p>for each column, find the <strong>largest absolute</strong> value</p></li>
-<li><p>if the <strong>lergest absolute</strong> value comes from a negative value, make it positve by multiplying the entire column by -1</p></li>
+<li><p>if the <strong>largest absolute</strong> value comes from a negative value, make it positive by multiplying the entire column with -1</p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -304,7 +323,7 @@ Labels          : [0 1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/8bc41433ad348f24c5bf9433d094eeef998df3baf2ac1c166735717664f54102.png" src="_images/8bc41433ad348f24c5bf9433d094eeef998df3baf2ac1c166735717664f54102.png" />
+<img alt="_images/f245db7cbd274e04f23450e39c59367c4d18257345ff42f1230443f133598834.png" src="_images/f245db7cbd274e04f23450e39c59367c4d18257345ff42f1230443f133598834.png" />
 </div>
 </div>
 </section>
@@ -338,7 +357,7 @@ Labels          : [0 1 2]
 Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
 </pre></div>
 </div>
-<img alt="_images/d05b07182027c1c183e129fec450e6a72ccc241e38d0182ff7604ec932694593.png" src="_images/d05b07182027c1c183e129fec450e6a72ccc241e38d0182ff7604ec932694593.png" />
+<img alt="_images/8a4ad4bc70960326b83df4b24a255fe6da4b10757d6ab348b6b9a5e63da42f84.png" src="_images/8a4ad4bc70960326b83df4b24a255fe6da4b10757d6ab348b6b9a5e63da42f84.png" />
 </div>
 </div>
 </section>
@@ -385,6 +404,7 @@ Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
     <h3><a href="intro.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Principle Component Analysis</a><ul>
+<li><a class="reference internal" href="#what-is-pca">What is PCA?</a></li>
 <li><a class="reference internal" href="#preparations">Preparations</a></li>
 <li><a class="reference internal" href="#iris-dataset">Iris Dataset</a><ul>
 <li><a class="reference internal" href="#standardization">Standardization</a></li>
