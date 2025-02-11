@@ -30,6 +30,8 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"HTML-CSS": {"matchFontHeight": true, "scale": 50}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -156,6 +158,9 @@ Labels          : [0 1 2]
 </div>
 <section id="standardization">
 <h3>Standardization<a class="headerlink" href="#standardization" title="Link to this heading">¶</a></h3>
+<p>Definition:</p>
+<div class="math notranslate nohighlight">
+\[ \mathrm{X}^{\prime}=\frac{\mathrm{X}-\text { Mean }}{\text { Standard deviation }} \]</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">means</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -166,6 +171,7 @@ Labels          : [0 1 2]
 </div>
 </div>
 </div>
+<p>Let us plot the standardized dataset.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
@@ -197,6 +203,15 @@ Labels          : [0 1 2]
 </section>
 <section id="covariance-matrix">
 <h3>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Link to this heading">¶</a></h3>
+<p>Defintion:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left[\begin{array}{cccc}\operatorname{Var}\left(x_1\right) &amp; \cdots &amp; \operatorname{Cov}\left(x_{n}, x_1\right) \\ \vdots &amp; \ddots &amp; &amp; \vdots \\ \vdots &amp; \ddots &amp; \vdots \\ \operatorname{Cov}\left(x_{n,}, x_1\right) &amp; \cdots &amp; \operatorname{Var}^2\left(x_{n}\right)\end{array}\right]\end{split}\]</div>
+<p>where:</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{Cov}(x, y)=\frac{\sum(x-\bar{x})(y-y)}{N-1}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{Var}(x)=\frac{\sum(x-\bar{x})^2}{N-1}\]</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cov_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X_std</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="c1"># square symmetric, positive semi-definite</span>
@@ -216,23 +231,29 @@ Labels          : [0 1 2]
 </section>
 <section id="singular-value-decompostion">
 <h3>Singular Value Decompostion<a class="headerlink" href="#singular-value-decompostion" title="Link to this heading">¶</a></h3>
-<p>For square symmetric positive semi-definite matrix (such as covariance matrix), eigenvalue and singular value decompositions are exactly the same.</p>
+<p>Defintion:</p>
+<div class="math notranslate nohighlight">
+\[ A=U \Sigma V^T\]</div>
+<p>For square symmetric positive semi-definite matrix (such as covariance matrix), the eigenvalues and <span class="math notranslate nohighlight">\(\operatorname{diag}(\Sigma)\)</span> are exactly the same and <span class="math notranslate nohighlight">\(U\)</span> is the Eigen-vector matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
-
 <span class="n">eig_vals</span> <span class="o">=</span> <span class="n">S</span>
 <span class="n">eig_vecs</span> <span class="o">=</span> <span class="n">U</span>
 
-<span class="n">U</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-0.52237175, -0.37231839,  0.72101672,  0.26199553],
-       [ 0.2633548 , -0.9255565 , -0.24203298, -0.12413483],
-       [-0.58125407, -0.02109465, -0.14089245, -0.80115419],
-       [-0.56561092, -0.06541562, -0.63380142,  0.52354641]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[2.93035432 0.92740345 0.14834225 0.02074602]
+
+[[-0.52237175 -0.37231839  0.72101672  0.26199553]
+ [ 0.2633548  -0.9255565  -0.24203298 -0.12413483]
+ [-0.58125407 -0.02109465 -0.14089245 -0.80115419]
+ [-0.56561092 -0.06541562 -0.63380142  0.52354641]]
 </pre></div>
 </div>
 </div>
@@ -256,12 +277,14 @@ Labels          : [0 1 2]
 <span class="n">eig_vecs_</span> <span class="o">=</span> <span class="n">eig_vecs</span><span class="o">*</span><span class="n">signs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">eig_vals</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">eig_vecs_</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[2.93035432 0.92740345 0.14834225 0.02074602]
+
 [[ 0.52237175  0.37231839  0.72101672 -0.26199553]
  [-0.2633548   0.9255565  -0.24203298  0.12413483]
  [ 0.58125407  0.02109465 -0.14089245  0.80115419]
