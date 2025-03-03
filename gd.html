@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Gradient Descent Method &#8212; AEK3LBB3</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"HTML-CSS": {"matchFontHeight": true, "scale": 50}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Nearest Neighbor" href="nearestneighbors.html" />
+    <link rel="prev" title="Principle Component Analysis" href="pca.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="nearestneighbors.html" title="Nearest Neighbor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pca.html" title="Principle Component Analysis"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Gradient Descent Method</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="gradient-descent-method">
+<h1>Gradient Descent Method<a class="headerlink" href="#gradient-descent-method" title="Link to this heading">¶</a></h1>
+<section id="references">
+<h2>References:<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.geeksforgeeks.org/how-to-implement-a-gradient-descent-in-python-to-find-a-local-minimum/">How to implement a gradient descent in Python to find a local minimum ?</a></p></li>
+</ul>
+</section>
+<section id="preparations">
+<h2>Preparations<a class="headerlink" href="#preparations" title="Link to this heading">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing Libraries</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="example">
+<h2>Example:<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<p>We are given a set of points in 2 dimensions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="mf">32.50234527</span><span class="p">,</span> <span class="mf">53.42680403</span><span class="p">,</span> <span class="mf">61.53035803</span><span class="p">,</span> <span class="mf">47.47563963</span><span class="p">,</span> <span class="mf">59.81320787</span><span class="p">,</span>
+        <span class="mf">55.14218841</span><span class="p">,</span> <span class="mf">52.21179669</span><span class="p">,</span> <span class="mf">39.29956669</span><span class="p">,</span> <span class="mf">48.10504169</span><span class="p">,</span> <span class="mf">52.55001444</span><span class="p">,</span>
+        <span class="mf">45.41973014</span><span class="p">,</span> <span class="mf">54.35163488</span><span class="p">,</span> <span class="mf">44.1640495</span> <span class="p">,</span> <span class="mf">58.16847072</span><span class="p">,</span> <span class="mf">56.72720806</span><span class="p">,</span>
+        <span class="mf">48.95588857</span><span class="p">,</span> <span class="mf">44.68719623</span><span class="p">,</span> <span class="mf">60.29732685</span><span class="p">,</span> <span class="mf">45.61864377</span><span class="p">,</span> <span class="mf">38.81681754</span><span class="p">])</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="mf">31.70700585</span><span class="p">,</span> <span class="mf">68.77759598</span><span class="p">,</span> <span class="mf">62.5623823</span> <span class="p">,</span> <span class="mf">71.54663223</span><span class="p">,</span> <span class="mf">87.23092513</span><span class="p">,</span>
+        <span class="mf">78.21151827</span><span class="p">,</span> <span class="mf">79.64197305</span><span class="p">,</span> <span class="mf">59.17148932</span><span class="p">,</span> <span class="mf">75.3312423</span> <span class="p">,</span> <span class="mf">71.30087989</span><span class="p">,</span>
+        <span class="mf">55.16567715</span><span class="p">,</span> <span class="mf">82.47884676</span><span class="p">,</span> <span class="mf">62.00892325</span><span class="p">,</span> <span class="mf">75.39287043</span><span class="p">,</span> <span class="mf">81.43619216</span><span class="p">,</span>
+        <span class="mf">60.72360244</span><span class="p">,</span> <span class="mf">82.89250373</span><span class="p">,</span> <span class="mf">97.37989686</span><span class="p">,</span> <span class="mf">48.84715332</span><span class="p">,</span> <span class="mf">56.87721319</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We are going to establish the best relationship between <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> as <code class="docutils literal notranslate"><span class="pre">Y_pred</span> <span class="pre">=</span> <span class="pre">w</span> <span class="pre">*</span> <span class="pre">X</span> <span class="pre">+</span> <span class="pre">b</span></code>. Find the best value for <code class="docutils literal notranslate"><span class="pre">w</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> such that the error between <code class="docutils literal notranslate"><span class="pre">Y_pred</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is minimum.</p>
+<section id="loss-and-loss-gradient">
+<h3>Loss and loss gradient<a class="headerlink" href="#loss-and-loss-gradient" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(X=(x_i)\)</span>,  <span class="math notranslate nohighlight">\(Y = (y_i)\)</span>, and <span class="math notranslate nohighlight">\(Y_{\text{pred}} = (w x_i + b)\)</span>. Next, let us define a loss (cost) function as the mean squared errors between <span class="math notranslate nohighlight">\(Y\)</span> and <span class="math notranslate nohighlight">\(Y_{\text{pred}}\)</span>.</p>
+<p>The loss function:
+$<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y_i-\underbrace{\left(w x_i+b\right)}_{Y_{\text{pred}}}\right)^2  =\frac{1}{n} \sum_{i=1}^n\left(y_i-w x_i-b\right)^2 \)</span>$</p>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(J\)</span> is the total lost</p></li>
+<li><p><span class="math notranslate nohighlight">\(y_i\)</span> is the measurement at <span class="math notranslate nohighlight">\(x_i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(w\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are the weight and the bias which are associated to <span class="math notranslate nohighlight">\(x_i\)</span> and used to estimate <span class="math notranslate nohighlight">\(y_i\)</span></p></li>
+</ul>
+<p>The gradient is computed as folows:</p>
+<div class="math notranslate nohighlight">
+\[ \left[\frac{\partial J}{\partial w}, \frac{\partial J}{\partial b}\right] = \left[ \frac{-2}{n} \sum_{i=1}^n x_i \left(y_i-w x_i-b \right) , \frac{-2}{n} \sum_{i=1}^n \left(y_i-w x_i-b\right)\right] \]</div>
+<p>The gradient is a vector of two elements.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">loss_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="c1"># Calculating the loss or cost</span>
+    <span class="c1"># Returns the loss and the loss gradient</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">loss_grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)),</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)])</span>
+
+    <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">loss_grad</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-gradient-descent-method">
+<h3>The gradient descent method<a class="headerlink" href="#the-gradient-descent-method" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gradient Descent Function</span>
+<span class="c1"># Here iterations, learning_rate, stopping_threshold can be tuned</span>
+<span class="k">def</span> <span class="nf">gradient_descent</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">):</span>   
+    <span class="c1"># Initializing weight, bias, learning rate and iterations</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">0.01</span>
+      
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev_loss</span> <span class="o">=</span> <span class="kc">None</span>
+      
+    <span class="c1"># Estimation of optimal parameters </span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+        <span class="c1"># Calculationg the current loss</span>
+        <span class="n">loss</span><span class="p">,</span> <span class="n">dloss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+  
+        <span class="c1"># If the change in loss is less than or equal to </span>
+        <span class="c1"># stopping_threshold we stop the gradient descent</span>
+        <span class="k">if</span> <span class="n">prev_loss</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prev_loss</span><span class="o">-</span><span class="n">loss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">stopping_threshold</span><span class="p">:</span>
+            <span class="k">break</span>
+          
+        <span class="n">prev_loss</span> <span class="o">=</span> <span class="n">loss</span>
+  
+        <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>      
+          
+        <span class="c1"># Updating weights and bias</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">dloss</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">dloss</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+      
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: Loss </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">, Weight </span><span class="si">{</span><span class="n">w</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">, Bias </span><span class="si">{</span><span class="n">b</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      
+      
+    <span class="c1"># Visualizing the weights and cost at for all iterations</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">,</span> <span class="s1">&#39;.-&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+      
+    <span class="k">return</span> <span class="n">w</span><span class="p">,</span> <span class="n">b</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="main-program">
+<h3>Main program<a class="headerlink" href="#main-program" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Data</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="mf">32.50234527</span><span class="p">,</span> <span class="mf">53.42680403</span><span class="p">,</span> <span class="mf">61.53035803</span><span class="p">,</span> <span class="mf">47.47563963</span><span class="p">,</span> <span class="mf">59.81320787</span><span class="p">,</span>
+        <span class="mf">55.14218841</span><span class="p">,</span> <span class="mf">52.21179669</span><span class="p">,</span> <span class="mf">39.29956669</span><span class="p">,</span> <span class="mf">48.10504169</span><span class="p">,</span> <span class="mf">52.55001444</span><span class="p">,</span>
+        <span class="mf">45.41973014</span><span class="p">,</span> <span class="mf">54.35163488</span><span class="p">,</span> <span class="mf">44.1640495</span> <span class="p">,</span> <span class="mf">58.16847072</span><span class="p">,</span> <span class="mf">56.72720806</span><span class="p">,</span>
+        <span class="mf">48.95588857</span><span class="p">,</span> <span class="mf">44.68719623</span><span class="p">,</span> <span class="mf">60.29732685</span><span class="p">,</span> <span class="mf">45.61864377</span><span class="p">,</span> <span class="mf">38.81681754</span><span class="p">])</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="mf">31.70700585</span><span class="p">,</span> <span class="mf">68.77759598</span><span class="p">,</span> <span class="mf">62.5623823</span> <span class="p">,</span> <span class="mf">71.54663223</span><span class="p">,</span> <span class="mf">87.23092513</span><span class="p">,</span>
+        <span class="mf">78.21151827</span><span class="p">,</span> <span class="mf">79.64197305</span><span class="p">,</span> <span class="mf">59.17148932</span><span class="p">,</span> <span class="mf">75.3312423</span> <span class="p">,</span> <span class="mf">71.30087989</span><span class="p">,</span>
+        <span class="mf">55.16567715</span><span class="p">,</span> <span class="mf">82.47884676</span><span class="p">,</span> <span class="mf">62.00892325</span><span class="p">,</span> <span class="mf">75.39287043</span><span class="p">,</span> <span class="mf">81.43619216</span><span class="p">,</span>
+        <span class="mf">60.72360244</span><span class="p">,</span> <span class="mf">82.89250373</span><span class="p">,</span> <span class="mf">97.37989686</span><span class="p">,</span> <span class="mf">48.84715332</span><span class="p">,</span> <span class="mf">56.87721319</span><span class="p">])</span>
+
+<span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
+
+
+<span class="c1"># Estimating weight and bias using gradient descent</span>
+<span class="n">w</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">gradient_descent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated W: </span><span class="si">{</span><span class="n">w</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="se">\n</span><span class="s2">Estimated b: </span><span class="si">{</span><span class="n">b</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Making predictions using estimated parameters</span>
+<span class="n">Y_pred</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">X</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="c1"># Plotting the regression line</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="s1">&#39;--b&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iteration 1: Loss 4352.08893, Weight 0.75933, Bias 0.02289
+Iteration 2: Loss 1114.85615, Weight 1.08160, Bias 0.02918
+Iteration 3: Loss 341.42912, Weight 1.23913, Bias 0.03225
+Iteration 4: Loss 156.64495, Weight 1.31612, Bias 0.03375
+Iteration 5: Loss 112.49704, Weight 1.35376, Bias 0.03448
+Iteration 6: Loss 101.94939, Weight 1.37215, Bias 0.03483
+Iteration 7: Loss 99.42939, Weight 1.38115, Bias 0.03500
+Iteration 8: Loss 98.82732, Weight 1.38554, Bias 0.03508
+Iteration 9: Loss 98.68348, Weight 1.38769, Bias 0.03511
+Iteration 10: Loss 98.64911, Weight 1.38874, Bias 0.03513
+Iteration 11: Loss 98.64090, Weight 1.38925, Bias 0.03513
+Iteration 12: Loss 98.63893, Weight 1.38950, Bias 0.03513
+Iteration 13: Loss 98.63847, Weight 1.38963, Bias 0.03512
+Iteration 14: Loss 98.63835, Weight 1.38969, Bias 0.03512
+Iteration 15: Loss 98.63833, Weight 1.38972, Bias 0.03511
+Iteration 16: Loss 98.63832, Weight 1.38973, Bias 0.03510
+Iteration 17: Loss 98.63832, Weight 1.38974, Bias 0.03509
+</pre></div>
+</div>
+<img alt="_images/d6d9550e86bf3eff9820f8f3ccd1bce94fc9d1f4604a3d93295f3f3ee53d1b7f.png" src="_images/d6d9550e86bf3eff9820f8f3ccd1bce94fc9d1f4604a3d93295f3f3ee53d1b7f.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Estimated W: 1.38974
+Estimated b: 0.03509
+</pre></div>
+</div>
+<img alt="_images/0b95de404adfec3a1c37a1b5a2432554b11aee7bd9eebf6703040e2af6f5bb5d.png" src="_images/0b95de404adfec3a1c37a1b5a2432554b11aee7bd9eebf6703040e2af6f5bb5d.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="programming-homework">
+<h2>Programming Homework:<a class="headerlink" href="#programming-homework" title="Link to this heading">¶</a></h2>
+<p>Given the following function:</p>
+<p><span class="math notranslate nohighlight">\(f(x,y) \rightarrow \cos \left( \frac{1}{2}x \right) x \cos \left( \frac{1}{2}y\right)  \)</span></p>
+<p>By using gradient descent method, find its minimum point (<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>).</p>
+<section id="plot-the-loss-function">
+<h3>Plot the loss function<a class="headerlink" href="#plot-the-loss-function" title="Link to this heading">¶</a></h3>
+<p>To have a better understanding to our problem, let us plot <span class="math notranslate nohighlight">\(f(x,y)\)</span> for <span class="math notranslate nohighlight">\(-4 \leq x \leq 4\)</span> and <span class="math notranslate nohighlight">\(-4 \leq y \leq 4\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Put your code here</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id1">
+<h3>Loss and loss gradient<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">loss_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="c1"># Put your code here</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">loss_grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+    
+    <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">loss_grad</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h3>The gradient descent method<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">gradient_descent</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">):</span>
+    <span class="c1"># Initializing xmin, ymin, learning rate and iterations</span>
+    <span class="n">xmin</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="mf">0.</span>
+      
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev_loss</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Put your code here</span>
+    
+    <span class="k">return</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h3>Main program<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Put your main program here</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "py.3.12.4"
+        },
+        kernelOptions: {
+            name: "py.3.12.4",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'py.3.12.4'</script>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="intro.html">
+              <img class="logo" src="_static/logo.png" alt="Logo of Project name not set"/>
+            </a></p>
+  <div>
+    <h3><a href="intro.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Gradient Descent Method</a><ul>
+<li><a class="reference internal" href="#references">References:</a></li>
+<li><a class="reference internal" href="#preparations">Preparations</a></li>
+<li><a class="reference internal" href="#example">Example:</a><ul>
+<li><a class="reference internal" href="#loss-and-loss-gradient">Loss and loss gradient</a></li>
+<li><a class="reference internal" href="#the-gradient-descent-method">The gradient descent method</a></li>
+<li><a class="reference internal" href="#main-program">Main program</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#programming-homework">Programming Homework:</a><ul>
+<li><a class="reference internal" href="#plot-the-loss-function">Plot the loss function</a></li>
+<li><a class="reference internal" href="#id1">Loss and loss gradient</a></li>
+<li><a class="reference internal" href="#id2">The gradient descent method</a></li>
+<li><a class="reference internal" href="#id3">Main program</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="pca.html"
+                          title="previous chapter">Principle Component Analysis</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="nearestneighbors.html"
+                          title="next chapter">Nearest Neighbor</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gd.ipynb"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="nearestneighbors.html" title="Nearest Neighbor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pca.html" title="Principle Component Analysis"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Gradient Descent Method</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    </div>
+  </body>
+</html>

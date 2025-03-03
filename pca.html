@@ -35,8 +35,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Nearest Neighbor" href="nearestneighbors.html" />
-    <link rel="prev" title="Welcome to AEK3LBB3" href="intro.html" /> 
+    <link rel="next" title="Gradient Descent Method" href="gd.html" />
+    <link rel="prev" title="Matrix Decomposition" href="matrix-decomposition.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -45,10 +45,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="nearestneighbors.html" title="Nearest Neighbor"
+          <a href="gd.html" title="Gradient Descent Method"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="intro.html" title="Welcome to AEK3LBB3"
+          <a href="matrix-decomposition.html" title="Matrix Decomposition"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Principle Component Analysis</a></li> 
@@ -66,7 +66,7 @@
 <p>There are some differences:</p>
 <ul class="simple">
 <li><p>svd decomposition of the covariance matrix is used instead of the Eigen decomposition. Thus, the Eigen value and vector pairs are always in non-ascending order.</p></li>
-<li><p>Eigen value correction is an optional step which is needed to obtain identical results with scikit-learn.</p></li>
+<li><p>Additional Eigen value correction is an optional step which is needed to obtain identical results with scikit-learn.</p></li>
 </ul>
 <section id="what-is-pca">
 <h2>What is PCA?<a class="headerlink" href="#what-is-pca" title="Link to this heading">¶</a></h2>
@@ -85,8 +85,8 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;Times&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;sans-serif&quot;</span><span class="p">,</span>
     <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
 <span class="p">})</span>
 </pre></div>
@@ -97,6 +97,9 @@
 <section id="iris-dataset">
 <h2>Iris Dataset<a class="headerlink" href="#iris-dataset" title="Link to this heading">¶</a></h2>
 <p>The iris data is ideal for our learning purpose since the data has only 4 features: <code class="docutils literal notranslate"><span class="pre">sepal-length</span></code>, <code class="docutils literal notranslate"><span class="pre">sepal-width</span></code>, <code class="docutils literal notranslate"><span class="pre">petal-length</span></code>, and <code class="docutils literal notranslate"><span class="pre">petal-width</span></code>.</p>
+<p>More information about iris plan can be found here this <a class="reference external" href="https://en.wikipedia.org/wiki/Iris_(plant)">Wikipedia link</a>.</p>
+<section id="load-the-dataset">
+<h3>Load the Dataset<a class="headerlink" href="#load-the-dataset" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;./datasets/iris/iris.data&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
@@ -132,7 +135,7 @@ Labels          : [0 1 2]
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 
 <span class="n">names</span> <span class="o">=</span> <span class="n">feature_names</span>
@@ -153,14 +156,15 @@ Labels          : [0 1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/8b369481927b03d99860f8462ab96353caf3bffa2694f29a6770fdc7ecce9174.png" src="_images/8b369481927b03d99860f8462ab96353caf3bffa2694f29a6770fdc7ecce9174.png" />
+<img alt="_images/16bf06bfeae96865bdea3345b6077995183d5073146a5ec6c937610fe5674139.png" src="_images/16bf06bfeae96865bdea3345b6077995183d5073146a5ec6c937610fe5674139.png" />
 </div>
 </div>
+</section>
 <section id="standardization">
 <h3>Standardization<a class="headerlink" href="#standardization" title="Link to this heading">¶</a></h3>
 <p>Definition:</p>
 <div class="math notranslate nohighlight">
-\[ \mathrm{X}^{\prime}=\frac{\mathrm{X}-\text { Mean }}{\text { Standard deviation }} \]</div>
+\[ \mathrm{X_{\text{std}}}=\frac{\mathrm{X}-\text { Mean }}{\text { Standard deviation }} \]</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">means</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -176,7 +180,7 @@ Labels          : [0 1 2]
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 
 <span class="n">names</span> <span class="o">=</span> <span class="n">feature_names</span>
@@ -197,12 +201,12 @@ Labels          : [0 1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/0273fd64fc9bf40659a51c11ea1ef6b6e4771a254b2e9fc7f2c7f2838a721241.png" src="_images/0273fd64fc9bf40659a51c11ea1ef6b6e4771a254b2e9fc7f2c7f2838a721241.png" />
+<img alt="_images/b5fbae47ad1667644312460f1208eca0205322cb7cd7ad4875a72dfcd53546b0.png" src="_images/b5fbae47ad1667644312460f1208eca0205322cb7cd7ad4875a72dfcd53546b0.png" />
 </div>
 </div>
 </section>
 <section id="covariance-matrix">
-<h3>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Link to this heading">¶</a></h3>
+<h3>Covariance Matrix<a class="headerlink" href="#covariance-matrix" title="Link to this heading">¶</a></h3>
 <p>Defintion:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\left[\begin{array}{cccc}\operatorname{Var}\left(x_1\right) &amp; \cdots &amp; \operatorname{Cov}\left(x_{n}, x_1\right) \\ \vdots &amp; \ddots &amp; &amp; \vdots \\ \vdots &amp; \ddots &amp; \vdots \\ \operatorname{Cov}\left(x_{n,}, x_1\right) &amp; \cdots &amp; \operatorname{Var}^2\left(x_{n}\right)\end{array}\right]\end{split}\]</div>
@@ -237,19 +241,23 @@ Labels          : [0 1 2]
 <p>For square symmetric positive semi-definite matrix (such as covariance matrix), the eigenvalues and <span class="math notranslate nohighlight">\(\operatorname{diag}(\Sigma)\)</span> are exactly the same and <span class="math notranslate nohighlight">\(U\)</span> is the Eigen-vector matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
 <span class="n">eig_vals</span> <span class="o">=</span> <span class="n">S</span>
 <span class="n">eig_vecs</span> <span class="o">=</span> <span class="n">U</span>
 
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Eigen values (lambda):&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Corresponding Eigen-vector matrix (U):&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[2.93035432 0.92740345 0.14834225 0.02074602]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Eigen values (lambda):
+[2.93035432 0.92740345 0.14834225 0.02074602]
 
+Corresponding Eigen-vector matrix (U):
 [[-0.52237175 -0.37231839  0.72101672  0.26199553]
  [ 0.2633548  -0.9255565  -0.24203298 -0.12413483]
  [-0.58125407 -0.02109465 -0.14089245 -0.80115419]
@@ -259,8 +267,8 @@ Labels          : [0 1 2]
 </div>
 </div>
 </section>
-<section id="correct-the-eigen-matrix">
-<h3>Correct the Eigen Matrix<a class="headerlink" href="#correct-the-eigen-matrix" title="Link to this heading">¶</a></h3>
+<section id="correct-the-eigen-vector-matrix">
+<h3>Correct the Eigen-vector Matrix<a class="headerlink" href="#correct-the-eigen-vector-matrix" title="Link to this heading">¶</a></h3>
 <p><strong>This section is actually optional. This step is necessary if we want to keep our results identical to PCA from scikit-learn.</strong></p>
 <p>Correct the Eigen matrix such that:</p>
 <ul class="simple">
@@ -269,9 +277,7 @@ Labels          : [0 1 2]
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">eig</span>
-
-<span class="c1"># Adjusting the eigenvectors (loadings) that are largest in absolute value to be positive</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adjusting the eigenvectors (loadings) that are largest in absolute value to be positive</span>
 <span class="n">max_abs_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eig_vecs</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">signs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">eig_vecs</span><span class="p">[</span><span class="n">max_abs_idx</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">eig_vecs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
 <span class="n">eig_vecs_</span> <span class="o">=</span> <span class="n">eig_vecs</span><span class="o">*</span><span class="n">signs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:]</span>
@@ -296,6 +302,9 @@ Labels          : [0 1 2]
 </section>
 <section id="select-the-axis-components">
 <h3>Select the Axis Components<a class="headerlink" href="#select-the-axis-components" title="Link to this heading">¶</a></h3>
+<p>Let us introdue <span class="math notranslate nohighlight">\(W\)</span> as the new axis components where:
+$<span class="math notranslate nohighlight">\( W \in (U_{i,j})_{1\leq j&lt;k}\)</span>$</p>
+<p>As an example, let us take <span class="math notranslate nohighlight">\(k=2\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Select top k eigenvectors</span>
@@ -317,8 +326,11 @@ Labels          : [0 1 2]
 </div>
 </div>
 </section>
-<section id="transform-the-dataset">
-<h3>Transform the Dataset<a class="headerlink" href="#transform-the-dataset" title="Link to this heading">¶</a></h3>
+<section id="project-the-dataset-to-the-new-axis-components">
+<h3>Project the Dataset to the New Axis Components<a class="headerlink" href="#project-the-dataset-to-the-new-axis-components" title="Link to this heading">¶</a></h3>
+<p>Let us introduce <span class="math notranslate nohighlight">\(X_\text{proj}\)</span> to represent the transformed dataset:</p>
+<div class="math notranslate nohighlight">
+\[X_\text{proj} = X_{\text{std}}\cdot W\]</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_proj</span> <span class="o">=</span> <span class="n">X_std</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
@@ -346,7 +358,7 @@ Labels          : [0 1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/f245db7cbd274e04f23450e39c59367c4d18257345ff42f1230443f133598834.png" src="_images/f245db7cbd274e04f23450e39c59367c4d18257345ff42f1230443f133598834.png" />
+<img alt="_images/cc3ca3020f06c1bb26786509095649e51bae2fc48c491a4cdb021ccf4f4c9762.png" src="_images/cc3ca3020f06c1bb26786509095649e51bae2fc48c491a4cdb021ccf4f4c9762.png" />
 </div>
 </div>
 </section>
@@ -354,6 +366,11 @@ Labels          : [0 1 2]
 <h3>Explained Variance<a class="headerlink" href="#explained-variance" title="Link to this heading">¶</a></h3>
 <p>The optimal value for <code class="docutils literal notranslate"><span class="pre">k</span></code> can be tuned by investigating the explained variance.</p>
 <p>The explained variance tells us how much information (variance) can be attributed to each of the principal components.</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Explained variance} = \frac{\sum_{i=0}^{r} \lambda_i}{\sum_{i=0}^{m} \lambda_i} = \frac{\lambda_1 + \lambda_2 + \cdots + \lambda_m}{\lambda_1 + \lambda_2 + \cdots + \lambda_r}
+\]</div>
+<p>where: <span class="math notranslate nohighlight">\(r&lt;= m\)</span></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
@@ -380,7 +397,435 @@ Labels          : [0 1 2]
 Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
 </pre></div>
 </div>
-<img alt="_images/8a4ad4bc70960326b83df4b24a255fe6da4b10757d6ab348b6b9a5e63da42f84.png" src="_images/8a4ad4bc70960326b83df4b24a255fe6da4b10757d6ab348b6b9a5e63da42f84.png" />
+<img alt="_images/3f5daf2833dd9e83b0209db77ab010c064cbdcf6e2232d50e601e1da6f5d5a86.png" src="_images/3f5daf2833dd9e83b0209db77ab010c064cbdcf6e2232d50e601e1da6f5d5a86.png" />
+</div>
+</div>
+</section>
+<section id="optional-comparison-to-scikit-learn">
+<h3>[OPTIONAL] Comparison to scikit-learn<a class="headerlink" href="#optional-comparison-to-scikit-learn" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_std</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;by sklearn:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ours:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>by sklearn:
+[[ 0.52237177  0.37231836]
+ [-0.2633548   0.9255565 ]
+ [ 0.5812542   0.02109469]
+ [ 0.56561077  0.06541561]]
+ours:
+[[ 0.52237175  0.37231839]
+ [-0.2633548   0.9255565 ]
+ [ 0.58125407  0.02109465]
+ [ 0.56561092  0.06541562]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="breast-cancer-wisconsin">
+<h2>Breast Cancer Wisconsin<a class="headerlink" href="#breast-cancer-wisconsin" title="Link to this heading">¶</a></h2>
+<p>In this section, we are going to exactly repeat the process but with different dataset. This time we are going to use the “Breast Cancer Winsconsin” dataset. The dataset can be found in <a class="reference external" href="https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic">this link.</a></p>
+<section id="id1">
+<h3>Load the Dataset<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;./datasets/breast_cancer/wdbc.data&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span>  <span class="c1"># 10 dimensions</span>
+
+<span class="c1"># Diagnosis (M = malignant, B = benign)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> 
+<span class="n">y</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;M&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">y</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;B&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">)]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels            :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 10
+Number of data    : 569
+Labels            : [0 1]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="n">names</span> <span class="o">=</span> <span class="n">feature_names</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">):</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_features</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">J</span><span class="p">):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">):</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/09ecddfc6c767aec2bf214c17394a6aa4fa3c1b94392cbace9eac3a14d5f6df7.png" src="_images/09ecddfc6c767aec2bf214c17394a6aa4fa3c1b94392cbace9eac3a14d5f6df7.png" />
+</div>
+</div>
+</section>
+<section id="id2">
+<h3>Standardization<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">means</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">stdevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">X_std</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">means</span><span class="p">)</span> <span class="o">/</span> <span class="n">stdevs</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="n">names</span> <span class="o">=</span> <span class="n">feature_names</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">):</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_features</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">J</span><span class="p">):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_std</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">X_std</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">):</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">X_std</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/995a6e4aefe7be88b59a870a6a3d320f96703301c57a17cb1af7bc3657a664a4.png" src="_images/995a6e4aefe7be88b59a870a6a3d320f96703301c57a17cb1af7bc3657a664a4.png" />
+</div>
+</div>
+</section>
+<section id="id3">
+<h3>Covariance Matrix<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cov_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X_std</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="c1"># square symmetric, positive semi-definite</span>
+<span class="n">cov_mat</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1.00176094,  0.32435181,  0.99961221,  0.9890958 ,  0.17088155,
+         0.5070149 ,  0.67795525,  0.82397659,  0.14800135, -0.31217959],
+       [ 0.32435181,  1.0017595 ,  0.33011302,  0.32165085, -0.02342967,
+         0.23711891,  0.30295012,  0.29398048,  0.07152665, -0.07657172],
+       [ 0.99961221,  0.33011302,  1.00176047,  0.9882437 ,  0.20764311,
+         0.55791689,  0.71739651,  0.852475  ,  0.18334941, -0.26193728],
+       [ 0.9890958 ,  0.32165085,  0.9882437 ,  1.00176084,  0.17734009,
+         0.49937956,  0.68719073,  0.8247182 ,  0.15155944, -0.28360833],
+       [ 0.17088155, -0.02342967,  0.20764311,  0.17734009,  1.00176065,
+         0.6602839 ,  0.52290284,  0.55466988,  0.55875676,  0.58582167],
+       [ 0.5070149 ,  0.23711891,  0.55791689,  0.49937956,  0.6602839 ,
+         1.00176123,  0.88467586,  0.83259839,  0.60370217,  0.56636431],
+       [ 0.67795525,  0.30295012,  0.71739651,  0.68719073,  0.52290284,
+         0.88467586,  1.00176081,  0.92301309,  0.50154808,  0.33737638],
+       [ 0.82397659,  0.29398048,  0.852475  ,  0.8247182 ,  0.55466988,
+         0.83259839,  0.92301309,  1.00176008,  0.46331148,  0.16721124],
+       [ 0.14800135,  0.07152665,  0.18334941,  0.15155944,  0.55875676,
+         0.60370217,  0.50154808,  0.46331148,  1.00176036,  0.48076628],
+       [-0.31217959, -0.07657172, -0.26193728, -0.28360833,  0.58582167,
+         0.56636431,  0.33737638,  0.16721124,  0.48076628,  1.00176089]])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="singular-value-decomposition">
+<h3>Singular Value Decomposition<a class="headerlink" href="#singular-value-decomposition" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
+<span class="n">eig_vals</span> <span class="o">=</span> <span class="n">S</span>
+<span class="n">eig_vecs</span> <span class="o">=</span> <span class="n">U</span>
+
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Eigen values (lambda):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Corresponding Eigen-vector matrix (U):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Eigen values (lambda):
+[5.48823388e+00 2.52314837e+00 8.82164732e-01 4.99887937e-01
+ 3.73195108e-01 1.24360330e-01 8.02263495e-02 3.49512095e-02
+ 1.11550684e-02 2.82803012e-04]
+
+Corresponding Eigen-vector matrix (U):
+[[-3.63937972e-01  3.13929153e-01 -1.24427511e-01 -2.95588247e-02
+   3.10669815e-02  2.64180136e-01  4.41883858e-02 -8.48340667e-02
+  -4.74425358e-01  6.69071413e-01]
+ [-1.54451004e-01  1.47180720e-01  9.51056567e-01 -8.91622037e-03
+   2.19923064e-01  3.22065970e-02 -2.05574958e-02  7.12679615e-03
+  -4.21263126e-03 -2.49787171e-04]
+ [-3.76044302e-01  2.84657886e-01 -1.14083492e-01 -1.34580222e-02
+   5.94505879e-03  2.37819413e-01  8.33692174e-02 -8.92588202e-02
+  -3.80167193e-01 -7.40490604e-01]
+ [-3.64085875e-01  3.04841769e-01 -1.23377776e-01 -1.34426478e-02
+   1.93411941e-02  3.31707472e-01 -2.61187892e-01 -1.44609754e-01
+   7.47347352e-01  3.23589432e-02]
+ [-2.32480547e-01 -4.01962266e-01 -1.66532794e-01  1.07801657e-01
+   8.43745304e-01 -6.22254152e-02 -1.12919959e-02 -1.70503087e-01
+  -5.84739110e-03 -3.69040281e-03]
+ [-3.64442177e-01 -2.66013205e-01  5.82779520e-02  1.85700466e-01
+  -2.40182885e-01 -5.27125212e-03  8.03804787e-01 -6.39801477e-02
+   2.18732340e-01  5.27527772e-02]
+ [-3.95748525e-01 -1.04285952e-01  4.11466126e-02  1.66653569e-01
+  -3.12533129e-01 -6.01467191e-01 -3.67136473e-01 -4.49573146e-01
+  -8.11706723e-02  1.03667690e-02]
+ [-4.18038283e-01 -7.18356651e-03 -6.85537632e-02  7.29838809e-02
+   9.18023839e-03 -2.65613274e-01 -1.41313093e-01  8.50918866e-01
+   2.20246782e-02  3.74756607e-03]
+ [-2.15237940e-01 -3.68300795e-01  3.67235622e-02 -8.92998490e-01
+  -1.12888376e-01  6.19570523e-02 -4.79020201e-02 -1.64556097e-02
+  -9.06786126e-03 -1.46695159e-03]
+ [-7.18374646e-02 -5.71767766e-01  1.13583924e-01  3.49331835e-01
+  -2.64877875e-01  5.67919020e-01 -3.45213566e-01  6.52594276e-02
+  -1.29667477e-01 -7.05733543e-03]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h3>Correct the Eigen-vector Matrix<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adjusting the eigenvectors (loadings) that are largest in absolute value to be positive</span>
+<span class="n">max_abs_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eig_vecs</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">signs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">eig_vecs</span><span class="p">[</span><span class="n">max_abs_idx</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">eig_vecs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+<span class="n">eig_vecs_</span> <span class="o">=</span> <span class="n">eig_vecs</span><span class="o">*</span><span class="n">signs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">eig_vals</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">eig_vecs_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[5.48823388e+00 2.52314837e+00 8.82164732e-01 4.99887937e-01
+ 3.73195108e-01 1.24360330e-01 8.02263495e-02 3.49512095e-02
+ 1.11550684e-02 2.82803012e-04]
+
+[[ 3.63937972e-01 -3.13929153e-01 -1.24427511e-01  2.95588247e-02
+   3.10669815e-02 -2.64180136e-01  4.41883858e-02 -8.48340667e-02
+  -4.74425358e-01 -6.69071413e-01]
+ [ 1.54451004e-01 -1.47180720e-01  9.51056567e-01  8.91622037e-03
+   2.19923064e-01 -3.22065970e-02 -2.05574958e-02  7.12679615e-03
+  -4.21263126e-03  2.49787171e-04]
+ [ 3.76044302e-01 -2.84657886e-01 -1.14083492e-01  1.34580222e-02
+   5.94505879e-03 -2.37819413e-01  8.33692174e-02 -8.92588202e-02
+  -3.80167193e-01  7.40490604e-01]
+ [ 3.64085875e-01 -3.04841769e-01 -1.23377776e-01  1.34426478e-02
+   1.93411941e-02 -3.31707472e-01 -2.61187892e-01 -1.44609754e-01
+   7.47347352e-01 -3.23589432e-02]
+ [ 2.32480547e-01  4.01962266e-01 -1.66532794e-01 -1.07801657e-01
+   8.43745304e-01  6.22254152e-02 -1.12919959e-02 -1.70503087e-01
+  -5.84739110e-03  3.69040281e-03]
+ [ 3.64442177e-01  2.66013205e-01  5.82779520e-02 -1.85700466e-01
+  -2.40182885e-01  5.27125212e-03  8.03804787e-01 -6.39801477e-02
+   2.18732340e-01 -5.27527772e-02]
+ [ 3.95748525e-01  1.04285952e-01  4.11466126e-02 -1.66653569e-01
+  -3.12533129e-01  6.01467191e-01 -3.67136473e-01 -4.49573146e-01
+  -8.11706723e-02 -1.03667690e-02]
+ [ 4.18038283e-01  7.18356651e-03 -6.85537632e-02 -7.29838809e-02
+   9.18023839e-03  2.65613274e-01 -1.41313093e-01  8.50918866e-01
+   2.20246782e-02 -3.74756607e-03]
+ [ 2.15237940e-01  3.68300795e-01  3.67235622e-02  8.92998490e-01
+  -1.12888376e-01 -6.19570523e-02 -4.79020201e-02 -1.64556097e-02
+  -9.06786126e-03  1.46695159e-03]
+ [ 7.18374646e-02  5.71767766e-01  1.13583924e-01 -3.49331835e-01
+  -2.64877875e-01 -5.67919020e-01 -3.45213566e-01  6.52594276e-02
+  -1.29667477e-01  7.05733543e-03]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h3>Select the Axis Components<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Select top k eigenvectors</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">eig_vecs_</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="c1"># Projection matrix</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.36393797 -0.31392915 -0.12442751]
+ [ 0.154451   -0.14718072  0.95105657]
+ [ 0.3760443  -0.28465789 -0.11408349]
+ [ 0.36408588 -0.30484177 -0.12337778]
+ [ 0.23248055  0.40196227 -0.16653279]
+ [ 0.36444218  0.26601321  0.05827795]
+ [ 0.39574852  0.10428595  0.04114661]
+ [ 0.41803828  0.00718357 -0.06855376]
+ [ 0.21523794  0.36830079  0.03672356]
+ [ 0.07183746  0.57176777  0.11358392]]
+(10, 3)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h3>Project the Dataset to the New Axis Components<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_proj</span> <span class="o">=</span> <span class="n">X_std</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X_proj</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(569, 3)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">));</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">);</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_proj</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_proj</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>  <span class="n">X_proj</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">);</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;PC1&#39;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;PC2&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([]);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;PC3&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zticks</span><span class="p">([]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/790b17a78486dabb5ac5db81967cf48cebe23daf0b23be0dd8ae4a42de271504.png" src="_images/790b17a78486dabb5ac5db81967cf48cebe23daf0b23be0dd8ae4a42de271504.png" />
+</div>
+</div>
+</section>
+<section id="id7">
+<h3>Explained Variance<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">eig_vals_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">eig_vals</span><span class="p">)</span>
+<span class="n">explained_variance</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="o">/</span> <span class="n">eig_vals_total</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">eig_vals</span><span class="p">]</span>
+<span class="n">explained_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">explained_variance</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">cum_explained_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">explained_variance</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Explained variance: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">explained_variance</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cumulative explained variance: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cum_explained_variance</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_features</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">cum_explained_variance</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_features</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Number of components&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Cumulative explained variance&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Explained variance: [54.79 25.19  8.81  4.99  3.73  1.24  0.8   0.35  0.11  0.  ]
+Cumulative explained variance: [ 54.79  79.98  88.79  93.78  97.51  98.75  99.55  99.9  100.01 100.01]
+</pre></div>
+</div>
+<img alt="_images/983e476ce91b9beb64f42947c89b2d4936a0d886bc24fb1ef4f537b6cad0fdb5.png" src="_images/983e476ce91b9beb64f42947c89b2d4936a0d886bc24fb1ef4f537b6cad0fdb5.png" />
+</div>
+</div>
+</section>
+<section id="id8">
+<h3>[OPTIONAL] Comparison to scikit-learn<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_std</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;by sklearn:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ours:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>by sklearn:
+[[ 0.36393797 -0.31392914 -0.12442742]
+ [ 0.15445098 -0.1471807   0.9510566 ]
+ [ 0.37604433 -0.2846579  -0.11408356]
+ [ 0.36408588 -0.3048417  -0.12337779]
+ [ 0.23248051  0.40196225 -0.16653267]
+ [ 0.3644422   0.2660132   0.05827787]
+ [ 0.39574856  0.10428593  0.04114657]
+ [ 0.41803825  0.00718356 -0.0685537 ]
+ [ 0.21523792  0.36830083  0.03672358]
+ [ 0.07183746  0.5717678   0.11358388]]
+ours:
+[[ 0.36393797 -0.31392915 -0.12442751]
+ [ 0.154451   -0.14718072  0.95105657]
+ [ 0.3760443  -0.28465789 -0.11408349]
+ [ 0.36408588 -0.30484177 -0.12337778]
+ [ 0.23248055  0.40196227 -0.16653279]
+ [ 0.36444218  0.26601321  0.05827795]
+ [ 0.39574852  0.10428595  0.04114661]
+ [ 0.41803828  0.00718357 -0.06855376]
+ [ 0.21523794  0.36830079  0.03672356]
+ [ 0.07183746  0.57176777  0.11358392]]
+</pre></div>
+</div>
 </div>
 </div>
 </section>
@@ -390,6 +835,7 @@ Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
 <ul class="simple">
 <li><p><a class="reference external" href="https://bagheri365.github.io/blog/Principal-Component-Analysis-from-Scratch/">Principal Component Analysis from Scratch</a></p></li>
 <li><p><a class="reference external" href="https://pure.eur.nl/ws/portalfiles/portal/95076086/Nature_Reviews_Methods_Primer_Greenacre_et_al_2022_PCA.pdf">Principal component analysis. Nat Rev Methods Primers 2, 100 (2022)</a></p></li>
+<li><p><a class="reference external" href="https://ocw.mit.edu/courses/18-650-statistics-for-applications-fall-2016/d85e1a9d113142ade8ce5e4f5ef0b4e8_MIT18_650F16_PCA.pdf">MIT OCW, Statistics for Applications, Chapter 9: Principal Component Analysis (PCA)</a></p></li>
 </ul>
 </section>
 </section>
@@ -403,16 +849,16 @@ Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "py.3.12.4"
+            mode: "python"
         },
         kernelOptions: {
-            name: "py.3.12.4",
+            name: "python3",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'py.3.12.4'</script>
+    <script>kernelName = 'python3'</script>
 
             <div class="clearer"></div>
           </div>
@@ -430,13 +876,27 @@ Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
 <li><a class="reference internal" href="#what-is-pca">What is PCA?</a></li>
 <li><a class="reference internal" href="#preparations">Preparations</a></li>
 <li><a class="reference internal" href="#iris-dataset">Iris Dataset</a><ul>
+<li><a class="reference internal" href="#load-the-dataset">Load the Dataset</a></li>
 <li><a class="reference internal" href="#standardization">Standardization</a></li>
-<li><a class="reference internal" href="#covariance-matrix">Covariance matrix</a></li>
+<li><a class="reference internal" href="#covariance-matrix">Covariance Matrix</a></li>
 <li><a class="reference internal" href="#singular-value-decompostion">Singular Value Decompostion</a></li>
-<li><a class="reference internal" href="#correct-the-eigen-matrix">Correct the Eigen Matrix</a></li>
+<li><a class="reference internal" href="#correct-the-eigen-vector-matrix">Correct the Eigen-vector Matrix</a></li>
 <li><a class="reference internal" href="#select-the-axis-components">Select the Axis Components</a></li>
-<li><a class="reference internal" href="#transform-the-dataset">Transform the Dataset</a></li>
+<li><a class="reference internal" href="#project-the-dataset-to-the-new-axis-components">Project the Dataset to the New Axis Components</a></li>
 <li><a class="reference internal" href="#explained-variance">Explained Variance</a></li>
+<li><a class="reference internal" href="#optional-comparison-to-scikit-learn">[OPTIONAL] Comparison to scikit-learn</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#breast-cancer-wisconsin">Breast Cancer Wisconsin</a><ul>
+<li><a class="reference internal" href="#id1">Load the Dataset</a></li>
+<li><a class="reference internal" href="#id2">Standardization</a></li>
+<li><a class="reference internal" href="#id3">Covariance Matrix</a></li>
+<li><a class="reference internal" href="#singular-value-decomposition">Singular Value Decomposition</a></li>
+<li><a class="reference internal" href="#id4">Correct the Eigen-vector Matrix</a></li>
+<li><a class="reference internal" href="#id5">Select the Axis Components</a></li>
+<li><a class="reference internal" href="#id6">Project the Dataset to the New Axis Components</a></li>
+<li><a class="reference internal" href="#id7">Explained Variance</a></li>
+<li><a class="reference internal" href="#id8">[OPTIONAL] Comparison to scikit-learn</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">References:</a></li>
@@ -447,13 +907,13 @@ Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="intro.html"
-                          title="previous chapter">Welcome to AEK3LBB3</a></p>
+    <p class="topless"><a href="matrix-decomposition.html"
+                          title="previous chapter">Matrix Decomposition</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="nearestneighbors.html"
-                          title="next chapter">Nearest Neighbor</a></p>
+    <p class="topless"><a href="gd.html"
+                          title="next chapter">Gradient Descent Method</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -483,10 +943,10 @@ Cumulative explained variance: [ 72.77  95.8   99.48 100.  ]
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="nearestneighbors.html" title="Nearest Neighbor"
+          <a href="gd.html" title="Gradient Descent Method"
              >next</a> |</li>
         <li class="right" >
-          <a href="intro.html" title="Welcome to AEK3LBB3"
+          <a href="matrix-decomposition.html" title="Matrix Decomposition"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Principle Component Analysis</a></li> 
