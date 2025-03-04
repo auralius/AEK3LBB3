@@ -63,7 +63,7 @@
   <section class="tex2jax_ignore mathjax_ignore" id="gradient-descent-method">
 <h1>Gradient Descent Method<a class="headerlink" href="#gradient-descent-method" title="Link to this heading">¶</a></h1>
 <section id="references">
-<h2>References:<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.geeksforgeeks.org/how-to-implement-a-gradient-descent-in-python-to-find-a-local-minimum/">How to implement a gradient descent in Python to find a local minimum ?</a></p></li>
 </ul>
@@ -80,8 +80,133 @@
 </div>
 </div>
 </section>
-<section id="example">
-<h2>Example:<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<section id="example-1">
+<h2>Example 1<a class="headerlink" href="#example-1" title="Link to this heading">¶</a></h2>
+<p>Given the following function (let us name the function as ‘loss function <span class="math notranslate nohighlight">\(L(w)\)</span>’):
+$<span class="math notranslate nohighlight">\( L (w ) = \frac{1}{2} (w-4)^2 \)</span>$</p>
+<p>Fine <span class="math notranslate nohighlight">\(w\)</span> where <span class="math notranslate nohighlight">\(L\)</span> is minimized!</p>
+<section id="plot-the-loss-function">
+<h3>Plot the loss function<a class="headerlink" href="#plot-the-loss-function" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;L(w)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/995e6645059c69309c04551453684a14fd904e4fa24f65d16bf205fecabf878a.png" src="_images/995e6645059c69309c04551453684a14fd904e4fa24f65d16bf205fecabf878a.png" />
+</div>
+</div>
+</section>
+<section id="loss-and-loss-gradient">
+<h3>Loss and loss gradient<a class="headerlink" href="#loss-and-loss-gradient" title="Link to this heading">¶</a></h3>
+<p>Loss function:</p>
+<div class="math notranslate nohighlight">
+\[ L (w ) = \frac{1}{2} (w-4)^2 \]</div>
+<p>Derivative of the loss function:</p>
+<div class="math notranslate nohighlight">
+\[ \frac{dL(w)}{dw} = (w-4) \]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">loss_fn</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+    <span class="c1"># Calculating the loss or cost</span>
+    <span class="c1"># Returns the loss and the loss gradient</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">loss_grad</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">loss_grad</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-gradient-descent-method">
+<h3>The gradient descent method<a class="headerlink" href="#the-gradient-descent-method" title="Link to this heading">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iterations</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.9</span>
+<span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">1e-6</span>
+
+<span class="c1"># Initializing w</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mf">0.</span>
+
+<span class="c1"># Data container</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span> 
+<span class="n">ws</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">dws</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">prev_loss</span> <span class="o">=</span> <span class="kc">None</span>
+  
+<span class="c1"># Gradient descent iterations </span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+    <span class="c1"># Calculationg the current loss</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">dloss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="c1"># If the change in loss is less than or equal to </span>
+    <span class="c1"># stopping_threshold we stop the gradient descent</span>
+    <span class="k">if</span> <span class="n">prev_loss</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prev_loss</span><span class="o">-</span><span class="n">loss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">stopping_threshold</span><span class="p">:</span>
+        <span class="k">break</span>
+      
+    <span class="n">prev_loss</span> <span class="o">=</span> <span class="n">loss</span>
+    <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="n">ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">dws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dloss</span><span class="p">)</span>
+      
+    <span class="c1"># Updating weights and bias</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">dloss</span><span class="p">)</span>
+  
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: L(w)=</span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">, dL(w)/dw=</span><span class="si">{</span><span class="n">dloss</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">, w=</span><span class="si">{</span><span class="n">w</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iteration 1: L(w)=8.00000, dL(w)/dw=-4.00000, w=3.60000
+Iteration 2: L(w)=0.08000, dL(w)/dw=-0.40000, w=3.96000
+Iteration 3: L(w)=0.00080, dL(w)/dw=-0.04000, w=3.99600
+Iteration 4: L(w)=0.00001, dL(w)/dw=-0.00400, w=3.99960
+Iteration 5: L(w)=0.00000, dL(w)/dw=-0.00040, w=3.99996
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span> <span class="c1"># Or equivalently,  &quot;plt.tight_layout()&quot;</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;#iteration&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;#iteration&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;L(w)&#39;</span><span class="p">)</span>
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="s1">&#39;.r&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dws</span><span class="p">)):</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axline</span><span class="p">((</span><span class="n">ws</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">losses</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="n">slope</span><span class="o">=</span><span class="n">dws</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/c41babe4b925cb560f7f87f4afa867f46aa34251e4bcc65a665b1a1861a53bde.png" src="_images/c41babe4b925cb560f7f87f4afa867f46aa34251e4bcc65a665b1a1861a53bde.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="example-2">
+<h2>Example 2<a class="headerlink" href="#example-2" title="Link to this heading">¶</a></h2>
 <p>We are given a set of points in 2 dimensions.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
         <span class="mf">32.50234527</span><span class="p">,</span> <span class="mf">53.42680403</span><span class="p">,</span> <span class="mf">61.53035803</span><span class="p">,</span> <span class="mf">47.47563963</span><span class="p">,</span> <span class="mf">59.81320787</span><span class="p">,</span>
@@ -96,8 +221,8 @@
 </pre></div>
 </div>
 <p>We are going to establish the best relationship between <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> as <code class="docutils literal notranslate"><span class="pre">Y_pred</span> <span class="pre">=</span> <span class="pre">w</span> <span class="pre">*</span> <span class="pre">X</span> <span class="pre">+</span> <span class="pre">b</span></code>. Find the best value for <code class="docutils literal notranslate"><span class="pre">w</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> such that the error between <code class="docutils literal notranslate"><span class="pre">Y_pred</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is minimum.</p>
-<section id="loss-and-loss-gradient">
-<h3>Loss and loss gradient<a class="headerlink" href="#loss-and-loss-gradient" title="Link to this heading">¶</a></h3>
+<section id="id1">
+<h3>Loss and loss gradient<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <p>Let <span class="math notranslate nohighlight">\(X=(x_i)\)</span>,  <span class="math notranslate nohighlight">\(Y = (y_i)\)</span>, and <span class="math notranslate nohighlight">\(Y_{\text{pred}} = (w x_i + b)\)</span>. Next, let us define a loss (cost) function as the mean squared errors between <span class="math notranslate nohighlight">\(Y\)</span> and <span class="math notranslate nohighlight">\(Y_{\text{pred}}\)</span>.</p>
 <p>The loss function:
 $<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y_i-\underbrace{\left(w x_i+b\right)}_{Y_{\text{pred}}}\right)^2  =\frac{1}{n} \sum_{i=1}^n\left(y_i-w x_i-b\right)^2 \)</span>$</p>
@@ -109,7 +234,7 @@ $<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y
 </ul>
 <p>The gradient is computed as folows:</p>
 <div class="math notranslate nohighlight">
-\[ \left[\frac{\partial J}{\partial w}, \frac{\partial J}{\partial b}\right] = \left[ \frac{-2}{n} \sum_{i=1}^n x_i \left(y_i-w x_i-b \right) , \frac{-2}{n} \sum_{i=1}^n \left(y_i-w x_i-b\right)\right] \]</div>
+\[ \left[\frac{\partial J}{\partial w}, \frac{\partial J}{\partial b}\right] = \left[ \underbrace{\frac{-2}{n} \sum_{i=1}^n x_i \left(y_i-w x_i-b \right)}_{\partial J / \partial w}, \underbrace{\frac{-2}{n} \sum_{i=1}^n \left(y_i-w x_i-b\right)}_{\partial J / \partial b}\right] \]</div>
 <p>The gradient is a vector of two elements.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -128,8 +253,8 @@ $<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y
 </div>
 </div>
 </section>
-<section id="the-gradient-descent-method">
-<h3>The gradient descent method<a class="headerlink" href="#the-gradient-descent-method" title="Link to this heading">¶</a></h3>
+<section id="id2">
+<h3>The gradient descent method<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gradient Descent Function</span>
@@ -140,7 +265,6 @@ $<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y
     <span class="n">b</span> <span class="o">=</span> <span class="mf">0.01</span>
       
     <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">prev_loss</span> <span class="o">=</span> <span class="kc">None</span>
       
     <span class="c1"># Estimation of optimal parameters </span>
@@ -156,7 +280,6 @@ $<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y
         <span class="n">prev_loss</span> <span class="o">=</span> <span class="n">loss</span>
   
         <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-        <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>      
           
         <span class="c1"># Updating weights and bias</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">dloss</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -195,7 +318,6 @@ $<span class="math notranslate nohighlight">\(J =\frac{1}{n} \sum_{i=1}^n\left(y
 <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
 <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
-
 
 <span class="c1"># Estimating weight and bias using gradient descent</span>
 <span class="n">w</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">gradient_descent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
@@ -245,12 +367,12 @@ Estimated b: 0.03509
 </section>
 </section>
 <section id="programming-homework">
-<h2>Programming Homework:<a class="headerlink" href="#programming-homework" title="Link to this heading">¶</a></h2>
+<h2>Programming Homework<a class="headerlink" href="#programming-homework" title="Link to this heading">¶</a></h2>
 <p>Given the following function:</p>
 <p><span class="math notranslate nohighlight">\(f(x,y) \rightarrow \cos \left( \frac{1}{2}x \right) x \cos \left( \frac{1}{2}y\right)  \)</span></p>
 <p>By using gradient descent method, find its minimum point (<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>).</p>
-<section id="plot-the-loss-function">
-<h3>Plot the loss function<a class="headerlink" href="#plot-the-loss-function" title="Link to this heading">¶</a></h3>
+<section id="id3">
+<h3>Plot the loss function<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <p>To have a better understanding to our problem, let us plot <span class="math notranslate nohighlight">\(f(x,y)\)</span> for <span class="math notranslate nohighlight">\(-4 \leq x \leq 4\)</span> and <span class="math notranslate nohighlight">\(-4 \leq y \leq 4\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -260,8 +382,8 @@ Estimated b: 0.03509
 </div>
 </div>
 </section>
-<section id="id1">
-<h3>Loss and loss gradient<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<section id="id4">
+<h3>Loss and loss gradient<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">loss_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -277,8 +399,8 @@ Estimated b: 0.03509
 </div>
 </div>
 </section>
-<section id="id2">
-<h3>The gradient descent method<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<section id="id5">
+<h3>The gradient descent method<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">gradient_descent</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">):</span>
@@ -298,8 +420,8 @@ Estimated b: 0.03509
 </div>
 </div>
 </section>
-<section id="id3">
-<h3>Main program<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<section id="id6">
+<h3>Main program<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Put your main program here</span>
@@ -344,19 +466,25 @@ Estimated b: 0.03509
     <h3><a href="intro.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Gradient Descent Method</a><ul>
-<li><a class="reference internal" href="#references">References:</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
 <li><a class="reference internal" href="#preparations">Preparations</a></li>
-<li><a class="reference internal" href="#example">Example:</a><ul>
+<li><a class="reference internal" href="#example-1">Example 1</a><ul>
+<li><a class="reference internal" href="#plot-the-loss-function">Plot the loss function</a></li>
 <li><a class="reference internal" href="#loss-and-loss-gradient">Loss and loss gradient</a></li>
 <li><a class="reference internal" href="#the-gradient-descent-method">The gradient descent method</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-2">Example 2</a><ul>
+<li><a class="reference internal" href="#id1">Loss and loss gradient</a></li>
+<li><a class="reference internal" href="#id2">The gradient descent method</a></li>
 <li><a class="reference internal" href="#main-program">Main program</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#programming-homework">Programming Homework:</a><ul>
-<li><a class="reference internal" href="#plot-the-loss-function">Plot the loss function</a></li>
-<li><a class="reference internal" href="#id1">Loss and loss gradient</a></li>
-<li><a class="reference internal" href="#id2">The gradient descent method</a></li>
-<li><a class="reference internal" href="#id3">Main program</a></li>
+<li><a class="reference internal" href="#programming-homework">Programming Homework</a><ul>
+<li><a class="reference internal" href="#id3">Plot the loss function</a></li>
+<li><a class="reference internal" href="#id4">Loss and loss gradient</a></li>
+<li><a class="reference internal" href="#id5">The gradient descent method</a></li>
+<li><a class="reference internal" href="#id6">Main program</a></li>
 </ul>
 </li>
 </ul>
