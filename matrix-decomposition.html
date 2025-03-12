@@ -100,13 +100,13 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-<span class="n">A</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[4, 1],
-       [2, 1]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[4 1]
+ [2 1]]
 </pre></div>
 </div>
 </div>
@@ -172,13 +172,13 @@ Eigenvector matrix =
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-<span class="n">A</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[4, 1],
-       [2, 1]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[4 1]
+ [2 1]]
 </pre></div>
 </div>
 </div>
@@ -206,31 +206,6 @@ S =
 V = 
 [[-0.95709203 -0.28978415]
  [-0.28978415  0.95709203]]
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="nd">@V</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[4., 1.],
-       [2., 1.]])
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(1.9999999999999996)
 </pre></div>
 </div>
 </div>
@@ -302,8 +277,8 @@ V =
 </div>
 <p>Hence, for a covariance matrix, which is a symmetric and positive definite matrix, we can use SVD decomposition to replace the Eigen decomposition:</p>
 <ul class="simple">
-<li><p>Both <span class="math notranslate nohighlight">\(\mathbf{U}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{V}\)</span> are the Eigen-vector matrix</p></li>
-<li><p>Both <span class="math notranslate nohighlight">\(\text{diag}(\Lambda)\)</span> and <span class="math notranslate nohighlight">\(\text{diag}(\mathbf{\Sigma})\)</span> are the Eigen values.</p></li>
+<li><p>Both <span class="math notranslate nohighlight">\(\mathbf{U}\)</span> from SVD and <span class="math notranslate nohighlight">\(\mathbf{V}\)</span> from Eigen decomposition are the Eigen-vector matrix</p></li>
+<li><p>Both <span class="math notranslate nohighlight">\(\text{diag}(\mathbf{\Sigma})\)</span> from SVD and <span class="math notranslate nohighlight">\(\text{diag}(\mathbf{\Lambda})\)</span> from Eigen decomposiion are the Eigen values.</p></li>
 </ul>
 </section>
 <section id="references">

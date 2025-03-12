@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Linear Support Vector Machine &#8212; AEK3LBB3</title>
+    <title>Softmax Classifier &#8212; AEK3LBB3</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
@@ -33,8 +33,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Softmax Classifier" href="softmax.html" />
-    <link rel="prev" title="Nearest Neighbor" href="nearestneighbors.html" /> 
+    <link rel="prev" title="Linear Support Vector Machine" href="svm.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -43,13 +42,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="softmax.html" title="Softmax Classifier"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="nearestneighbors.html" title="Nearest Neighbor"
+          <a href="svm.html" title="Linear Support Vector Machine"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Linear Support Vector Machine</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Softmax Classifier</a></li> 
       </ul>
     </div>  
 
@@ -58,8 +54,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section class="tex2jax_ignore mathjax_ignore" id="linear-support-vector-machine">
-<h1>Linear Support Vector Machine<a class="headerlink" href="#linear-support-vector-machine" title="Link to this heading">¶</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="softmax-classifier">
+<h1>Softmax Classifier<a class="headerlink" href="#softmax-classifier" title="Link to this heading">¶</a></h1>
 <p><strong>This material is heavily based on the popular Standford CS231n lecture material.</strong> <a class="reference external" href="https://cs231n.github.io/">Please check on their website for more detailed information</a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -67,18 +63,20 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;sans-serif&quot;</span><span class="p">,</span>
     <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
 <span class="p">})</span>
 
 <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<section id="class-svm">
-<h2>Class SVM<a class="headerlink" href="#class-svm" title="Link to this heading">¶</a></h2>
+<section id="class-softmax">
+<h2>Class Softmax<a class="headerlink" href="#class-softmax" title="Link to this heading">¶</a></h2>
 <p>This is the implementation of the linear SVM:</p>
 <ul class="simple">
 <li><p>There two metods: <code class="docutils literal notranslate"><span class="pre">train(X,</span> <span class="pre">y)</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">predict(X)</span></code>.</p></li>
@@ -88,7 +86,7 @@
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SVM</span><span class="p">():</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Softmax</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Train this linear classifier using stochastic gradient descent.</span>
@@ -131,13 +129,13 @@
             <span class="n">y_batch</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">batch_indices</span><span class="p">]</span>
             
             <span class="c1"># evaluate loss and gradient</span>
-            <span class="n">loss</span><span class="p">,</span> <span class="n">grad</span> <span class="o">=</span> <span class="n">svm_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
+            <span class="n">loss</span><span class="p">,</span> <span class="n">grad</span> <span class="o">=</span> <span class="n">softmax_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
             <span class="n">loss_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 
             <span class="c1"># Update the weights using the gradient and the learning rate.          </span>
             <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">-</span> <span class="n">learning_rate</span> <span class="o">*</span> <span class="n">grad</span>
      
-            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">%</span> <span class="mi">5000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;iteration </span><span class="si">%d</span><span class="s1"> / </span><span class="si">%d</span><span class="s1">: loss </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">,</span> <span class="n">loss</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">loss_history</span>
@@ -186,8 +184,7 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;./datasets/breast_cancer/wdbc.data&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span>  <span class="c1"># 10 dimensions</span>
 
-<span class="c1"># Diagnosis (M = malignant, Ba</span>
-<span class="c1">#  = benign)</span>
+<span class="c1"># Diagnosis (M = malignant, B = benign)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> 
 <span class="n">y</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;M&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">y</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;B&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -226,30 +223,40 @@ Labels            : [0 1]
 <h3>Train the Classifier<a class="headerlink" href="#train-the-classifier" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">SVM</span><span class="p">()</span>
-<span class="n">loss_hist</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">Softmax</span><span class="p">()</span>
+<span class="n">loss_hist</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">50000</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 10000: loss 0.844559
-iteration 1000 / 10000: loss 0.690024
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 50000: loss 0.711060
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 2000 / 10000: loss 0.418864
-iteration 3000 / 10000: loss 0.424866
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 / 50000: loss 0.445552
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 4000 / 10000: loss 0.413006
-iteration 5000 / 10000: loss 0.387455
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 / 50000: loss 0.385188
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 6000 / 10000: loss 0.451244
-iteration 7000 / 10000: loss 0.388950
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 / 50000: loss 0.378425
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 8000 / 10000: loss 0.359455
-iteration 9000 / 10000: loss 0.385410
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 20000 / 50000: loss 0.336645
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 25000 / 50000: loss 0.356140
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 30000 / 50000: loss 0.378567
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 35000 / 50000: loss 0.323238
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 40000 / 50000: loss 0.339401
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 45000 / 50000: loss 0.370951
 </pre></div>
 </div>
 </div>
@@ -268,7 +275,7 @@ iteration 9000 / 10000: loss 0.385410
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/b94138cc3710cf195ad60dd86ad1d609bc03f699a52ca2197b0611e44a78e176.png" src="_images/b94138cc3710cf195ad60dd86ad1d609bc03f699a52ca2197b0611e44a78e176.png" />
+<img alt="_images/ca218e98b995c5166eaf1b987ff86b3dc5a3217cd5bce327dc5e6c78f0c53fde.png" src="_images/ca218e98b995c5166eaf1b987ff86b3dc5a3217cd5bce327dc5e6c78f0c53fde.png" />
 </div>
 </div>
 </section>
@@ -285,8 +292,8 @@ iteration 9000 / 10000: loss 0.385410
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.850000
-validation accuracy: 0.916667
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.852500
+validation accuracy: 0.869048
 </pre></div>
 </div>
 </div>
@@ -346,40 +353,70 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 <h3>Train the Classifier<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">SVM</span><span class="p">()</span>
-<span class="n">loss_hist</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">Softmax</span><span class="p">()</span>
+<span class="n">loss_hist</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 10000: loss 8.979710
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 100000: loss 2.305072
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 1000 / 10000: loss 0.621868
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 / 100000: loss 0.973135
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 2000 / 10000: loss 0.374369
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 / 100000: loss 0.606859
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 3000 / 10000: loss 0.358701
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 / 100000: loss 0.469529
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 4000 / 10000: loss 0.348627
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 20000 / 100000: loss 0.380627
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 / 10000: loss 0.315057
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 25000 / 100000: loss 0.357553
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 6000 / 10000: loss 0.329200
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 30000 / 100000: loss 0.302809
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 7000 / 10000: loss 0.242151
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 35000 / 100000: loss 0.271545
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 8000 / 10000: loss 0.201741
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 40000 / 100000: loss 0.249556
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 9000 / 10000: loss 0.211652
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 45000 / 100000: loss 0.252423
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 50000 / 100000: loss 0.235657
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 55000 / 100000: loss 0.227351
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 60000 / 100000: loss 0.212872
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 65000 / 100000: loss 0.232677
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 70000 / 100000: loss 0.231669
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 75000 / 100000: loss 0.206416
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 80000 / 100000: loss 0.189172
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 85000 / 100000: loss 0.185344
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 90000 / 100000: loss 0.172544
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 95000 / 100000: loss 0.208323
 </pre></div>
 </div>
 </div>
@@ -398,7 +435,7 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/a1b0a47abd18402722ad91bd5be8df258dda0a09cb129e99e483638040ae98c7.png" src="_images/a1b0a47abd18402722ad91bd5be8df258dda0a09cb129e99e483638040ae98c7.png" />
+<img alt="_images/759d6727426a301142c11023737a90a946ffdbb4419ce4622a9dc309480bbbd5.png" src="_images/759d6727426a301142c11023737a90a946ffdbb4419ce4622a9dc309480bbbd5.png" />
 </div>
 </div>
 </section>
@@ -415,8 +452,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.959456
-validation accuracy: 0.929883
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.962072
+validation accuracy: 0.935448
 </pre></div>
 </div>
 </div>
@@ -447,7 +484,7 @@ validation accuracy: 0.929883
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/178ff54a953fe28d190d3cf95950f83db7788f23ea5ab7a865f78995ff632fb5.png" src="_images/178ff54a953fe28d190d3cf95950f83db7788f23ea5ab7a865f78995ff632fb5.png" />
+<img alt="_images/e214d18ced20901e6f0d28afcb064a8675330b78feda59b97fe3de8cdca095f0.png" src="_images/e214d18ced20901e6f0d28afcb064a8675330b78feda59b97fe3de8cdca095f0.png" />
 </div>
 </div>
 </section>
@@ -463,16 +500,16 @@ validation accuracy: 0.929883
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "py.3.12.4"
         },
         kernelOptions: {
-            name: "python3",
+            name: "py.3.12.4",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'py.3.12.4'</script>
 
             <div class="clearer"></div>
           </div>
@@ -486,8 +523,8 @@ validation accuracy: 0.929883
   <div>
     <h3><a href="intro.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Linear Support Vector Machine</a><ul>
-<li><a class="reference internal" href="#class-svm">Class SVM</a></li>
+<li><a class="reference internal" href="#">Softmax Classifier</a><ul>
+<li><a class="reference internal" href="#class-softmax">Class Softmax</a></li>
 <li><a class="reference internal" href="#breast-cancer-wisconsin">Breast Cancer Wisconsin</a><ul>
 <li><a class="reference internal" href="#load-the-dataset">Load the Dataset</a></li>
 <li><a class="reference internal" href="#split-the-dataset-for-training-and-test">Split The Dataset for Training and Test</a></li>
@@ -512,18 +549,13 @@ validation accuracy: 0.929883
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="nearestneighbors.html"
-                          title="previous chapter">Nearest Neighbor</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="softmax.html"
-                          title="next chapter">Softmax Classifier</a></p>
+    <p class="topless"><a href="svm.html"
+                          title="previous chapter">Linear Support Vector Machine</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/svm.ipynb"
+      <li><a href="_sources/softmax.ipynb"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -548,13 +580,10 @@ validation accuracy: 0.929883
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="softmax.html" title="Softmax Classifier"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="nearestneighbors.html" title="Nearest Neighbor"
+          <a href="svm.html" title="Linear Support Vector Machine"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Linear Support Vector Machine</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Softmax Classifier</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

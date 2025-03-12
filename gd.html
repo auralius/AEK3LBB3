@@ -132,7 +132,7 @@ $<span class="math notranslate nohighlight">\( L (w ) = \frac{1}{2} (w-4)^2 \)</
 <h3>The gradient descent method<a class="headerlink" href="#the-gradient-descent-method" title="Link to this heading">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iterations</span> <span class="o">=</span> <span class="mi">10</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.9</span>
 <span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">1e-6</span>
 
@@ -141,12 +141,12 @@ $<span class="math notranslate nohighlight">\( L (w ) = \frac{1}{2} (w-4)^2 \)</
 
 <span class="c1"># Data container</span>
 <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span> 
+<span class="n">dlosses</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">ws</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">dws</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">prev_loss</span> <span class="o">=</span> <span class="kc">None</span>
   
 <span class="c1"># Gradient descent iterations </span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
     <span class="c1"># Calculationg the current loss</span>
     <span class="n">loss</span><span class="p">,</span> <span class="n">dloss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 
@@ -157,8 +157,8 @@ $<span class="math notranslate nohighlight">\( L (w ) = \frac{1}{2} (w-4)^2 \)</
       
     <span class="n">prev_loss</span> <span class="o">=</span> <span class="n">loss</span>
     <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="n">dlosses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dloss</span><span class="p">)</span>
     <span class="n">ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-    <span class="n">dws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dloss</span><span class="p">)</span>
       
     <span class="c1"># Updating weights and bias</span>
     <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">dloss</span><span class="p">)</span>
@@ -194,8 +194,8 @@ Iteration 5: L(w)=0.00000, dL(w)/dw=-0.00040, w=3.99996
 <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="s1">&#39;.r&#39;</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dws</span><span class="p">)):</span>
-    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axline</span><span class="p">((</span><span class="n">ws</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">losses</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="n">slope</span><span class="o">=</span><span class="n">dws</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dlosses</span><span class="p">)):</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axline</span><span class="p">((</span><span class="n">ws</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">losses</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="n">slope</span><span class="o">=</span><span class="n">dlosses</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
     
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
