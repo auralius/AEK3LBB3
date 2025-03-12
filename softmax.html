@@ -65,7 +65,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
     <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;sans-serif&quot;</span><span class="p">,</span>
     <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
 <span class="p">})</span>
@@ -81,28 +81,28 @@
 <h2>Class Softmax<a class="headerlink" href="#class-softmax" title="Link to this heading">¶</a></h2>
 <p>This is the implementation of the linear Softmax classifier:</p>
 <ul class="simple">
-<li><p>The class has two metods: <code class="docutils literal notranslate"><span class="pre">train(X,</span> <span class="pre">Y)</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span> <span class="pre">=</span> <span class="pre">predict(X)</span></code>.</p></li>
-<li><p>Matrix <code class="docutils literal notranslate"><span class="pre">self.W</span></code> is the wight matrix and also includes the bias vector (<a class="reference external" href="https://cs231n.github.io/linear-classify/#interpreting-a-linear-classifier">bias tricks</a>).</p></li>
+<li><p>The Python class has two metods: <code class="docutils literal notranslate"><span class="pre">train(X,</span> <span class="pre">Y)</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span> <span class="pre">=</span> <span class="pre">predict(X)</span></code>.</p></li>
+<li><p>Matrix <code class="docutils literal notranslate"><span class="pre">self.W</span></code> is the weight matrix and also includes the bias vector (<a class="reference external" href="https://cs231n.github.io/linear-classify/#interpreting-a-linear-classifier">bias tricks</a>).</p></li>
 <li><p>Training is done by using stochastic gradient descent method.</p></li>
 </ul>
 <p><span class="math notranslate nohighlight">\( F = X W\)</span></p>
 <p><span class="math notranslate nohighlight">\( F_i \)</span> means the <span class="math notranslate nohighlight">\(i\)</span>-th row of <span class="math notranslate nohighlight">\(F\)</span></p>
-<p><span class="math notranslate nohighlight">\( \text{softmax}(i) = e^{F_{Y_{i}}} \Big/ \sum_{j} e^{F_{j}} \)</span></p>
+<p><span class="math notranslate nohighlight">\( \text{softmax}(i) = e^{F_{Y_{i}}} \Big/ \sum_{j=1}^C e^{F_{i}} \)</span></p>
 <p><span class="math notranslate nohighlight">\( L_{i}=-\log \left( \text{softmax}(i) \right) \)</span></p>
 <p><span class="math notranslate nohighlight">\( L=\underbrace{\frac{1}{N} \sum_{i=1}^N L_{i}}_{\text {data loss }}+\underbrace{\lambda R(W)}_{\text {regularization loss }} \)</span></p>
 <p><span class="math notranslate nohighlight">\( R(W) = \sum_{k=1}^C \sum_{l=1}^{D+1} W_{l, k}^{2} \)</span></p>
 <p>where:</p>
 <ul class="simple">
-<li><p>the dataset has <span class="math notranslate nohighlight">\(C\)</span> labels/classes (distinct categories) and <span class="math notranslate nohighlight">\(D\)</span> features (dimensionalities)</p></li>
-<li><p>the dataset is composed of features and labels</p></li>
-<li><p><span class="math notranslate nohighlight">\(X \in \mathbb{R}^{N \times (D+1)}\)</span> contains the feature data of N samples</p></li>
-<li><p><span class="math notranslate nohighlight">\(X_i \in \mathbb{R}^{D+1}\)</span> contains the feature data form <span class="math notranslate nohighlight">\(i\)</span>-th sample</p></li>
-<li><p><span class="math notranslate nohighlight">\(Y \in \mathbb{R}^{N}\)</span> contains the labels</p></li>
-<li><p><span class="math notranslate nohighlight">\(Y_i \in \mathbb{R}\)</span> contains the label of <span class="math notranslate nohighlight">\(i\)</span>-th sample</p></li>
+<li><p>the dataset contains <span class="math notranslate nohighlight">\(N\)</span> samples of data</p></li>
+<li><p>each sample has <span class="math notranslate nohighlight">\(D\)</span> features (dimensionalities) and <span class="math notranslate nohighlight">\(C\)</span> labels/classes (distinct categories)</p></li>
+<li><p><span class="math notranslate nohighlight">\(X \in \mathbb{R}^{N \times (D+1)}\)</span> contains the features from N samples of data</p></li>
+<li><p><span class="math notranslate nohighlight">\(X_i \in \mathbb{R}^{D+1}\)</span> contains the features of the <span class="math notranslate nohighlight">\(i\)</span>-th sample (<span class="math notranslate nohighlight">\(i\)</span>-th row of <span class="math notranslate nohighlight">\(X\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(Y \in \mathbb{R}^{N}\)</span> contains the labels from N samples of data</p></li>
+<li><p><span class="math notranslate nohighlight">\(Y_i \in \mathbb{R}\)</span> contains the label of the <span class="math notranslate nohighlight">\(i\)</span>-th sample (<span class="math notranslate nohighlight">\(i\)</span>-th row of <span class="math notranslate nohighlight">\(Y\)</span>)</p></li>
 <li><p><span class="math notranslate nohighlight">\(F_i \in \mathbb{R}^{C}\)</span> is the scores for all classes of <span class="math notranslate nohighlight">\(i\)</span>-th sample</p></li>
 <li><p><span class="math notranslate nohighlight">\(F_{y_i} \in \mathbb{R}\)</span> is the score for the correct class of <span class="math notranslate nohighlight">\(i\)</span>-th sample</p></li>
-<li><p><span class="math notranslate nohighlight">\(L \in \mathbb{R}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(L_i \in \mathbb{R}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(L \in \mathbb{R}\)</span> is the total loss</p></li>
+<li><p><span class="math notranslate nohighlight">\(L_i \in \mathbb{R}\)</span> is the loss of <span class="math notranslate nohighlight">\(i\)</span>-th sample</p></li>
 <li><p><span class="math notranslate nohighlight">\(W \in \mathbb{R}^{(D+1) \times C}\)</span> is the weight matrix (with augmented bias vector in the last row)</p></li>
 <li><p><span class="math notranslate nohighlight">\(R \in \mathbb{R}\)</span> is the regularization loss</p></li>
 </ul>
@@ -128,6 +128,7 @@
 <span class="sd">        - dW: gradient with respect to weights W; an array of same shape as W</span>
 
 <span class="sd">        References:</span>
+<span class="sd">        - https://github.com/lightaime/cs231n</span>
 <span class="sd">        - https://github.com/mantasu/cs231n</span>
 <span class="sd">        - https://github.com/jariasf/CS231n</span>
 <span class="sd">        </span>
@@ -214,7 +215,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">-</span> <span class="n">learning_rate</span> <span class="o">*</span> <span class="n">grad</span>
      
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">%</span> <span class="mi">5000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;iteration </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1">: loss </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">,</span> <span class="n">loss</span><span class="p">,),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;iteration&#39;</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">,</span> <span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">loss_history</span>
     
@@ -307,34 +308,34 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 of 50000: loss 0.713430
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 of 50000 loss 0.6809403573991747
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 of 50000: loss 0.448043
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 of 50000 loss 0.45575461112396565
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 of 50000: loss 0.412128
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 of 50000 loss 0.4024383188953465
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 of 50000: loss 0.367182
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 of 50000 loss 0.3888118382694023
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 20000 of 50000: loss 0.400474
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 20000 of 50000 loss 0.3535769666368139
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 25000 of 50000: loss 0.385453
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 25000 of 50000 loss 0.3807104633199281
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 30000 of 50000: loss 0.330407
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 30000 of 50000 loss 0.3425873108923661
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 35000 of 50000: loss 0.369434
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 35000 of 50000 loss 0.38270033762809513
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 40000 of 50000: loss 0.362267
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 40000 of 50000 loss 0.3395486617617978
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 45000 of 50000: loss 0.336772
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 45000 of 50000 loss 0.348599679532607
 </pre></div>
 </div>
 </div>
@@ -353,7 +354,7 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/ca76713042753a73390f8331f8df27934d45aea2cdb8f8ead8337ced12e9d654.png" src="_images/ca76713042753a73390f8331f8df27934d45aea2cdb8f8ead8337ced12e9d654.png" />
+<img alt="_images/2bf79af04a93e7b0da6ad9dbac1dbb5ffe746d250bdfc95ba17b38658f6afd4f.png" src="_images/2bf79af04a93e7b0da6ad9dbac1dbb5ffe746d250bdfc95ba17b38658f6afd4f.png" />
 </div>
 </div>
 </section>
@@ -370,7 +371,7 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.852500
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.855000
 validation accuracy: 0.869048
 </pre></div>
 </div>
@@ -432,69 +433,39 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">Softmax</span><span class="p">()</span>
-<span class="n">loss_hist</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+<span class="n">loss_hist</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">num_iters</span><span class="o">=</span><span class="mi">50000</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 of 100000: loss 2.309118
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 of 50000 loss 2.2987612024025537
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 of 100000: loss 0.960988
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 of 50000 loss 0.22882245900097933
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 of 100000: loss 0.618810
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 of 50000 loss 0.15979268892614784
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 of 100000: loss 0.440030
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 of 50000 loss 0.13483462928177695
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 20000 of 100000: loss 0.373673
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 20000 of 50000 loss 0.14108222824846237
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 25000 of 100000: loss 0.360080
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 25000 of 50000 loss 0.09796925085642634
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 30000 of 100000: loss 0.311502
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 30000 of 50000 loss 0.09234125470112756
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 35000 of 100000: loss 0.280711
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 35000 of 50000 loss 0.09963706353006735
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 40000 of 100000: loss 0.244826
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 40000 of 50000 loss 0.08509323108619017
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 45000 of 100000: loss 0.266873
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 50000 of 100000: loss 0.234398
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 55000 of 100000: loss 0.269621
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 60000 of 100000: loss 0.222180
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 65000 of 100000: loss 0.209751
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 70000 of 100000: loss 0.201925
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 75000 of 100000: loss 0.168937
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 80000 of 100000: loss 0.194360
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 85000 of 100000: loss 0.152142
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 90000 of 100000: loss 0.202745
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 95000 of 100000: loss 0.179438
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 45000 of 50000 loss 0.1126591094935436
 </pre></div>
 </div>
 </div>
@@ -513,7 +484,7 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/5d049fbbbaf041c31e9039d60a6af2fb741d87bd5fe0b98ea495c7bb74ce6ec4.png" src="_images/5d049fbbbaf041c31e9039d60a6af2fb741d87bd5fe0b98ea495c7bb74ce6ec4.png" />
+<img alt="_images/310faccb95ff97e21140d53542fcb72f7ec42b3cf015077b21faca9cb16d7e99.png" src="_images/310faccb95ff97e21140d53542fcb72f7ec42b3cf015077b21faca9cb16d7e99.png" />
 </div>
 </div>
 </section>
@@ -530,8 +501,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.961287
-validation accuracy: 0.932666
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.974627
+validation accuracy: 0.944908
 </pre></div>
 </div>
 </div>
@@ -550,6 +521,7 @@ validation accuracy: 0.932666
 <span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="n">w_min</span><span class="p">,</span> <span class="n">w_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="s1">&#39;6&#39;</span><span class="p">,</span> <span class="s1">&#39;7&#39;</span><span class="p">,</span> <span class="s1">&#39;8&#39;</span><span class="p">,</span> <span class="s1">&#39;9&#39;</span><span class="p">]</span>
+
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
       
@@ -562,7 +534,7 @@ validation accuracy: 0.932666
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/69c3ee3040dd40174200f561f8c066fbbdf7ab410a23a700970b83be10534de7.png" src="_images/69c3ee3040dd40174200f561f8c066fbbdf7ab410a23a700970b83be10534de7.png" />
+<img alt="_images/087a5c0f5f063568e31edb0683f66b5a8e10e2b7108d1be1594e0c0c9f5a4a87.png" src="_images/087a5c0f5f063568e31edb0683f66b5a8e10e2b7108d1be1594e0c0c9f5a4a87.png" />
 </div>
 </div>
 </section>
