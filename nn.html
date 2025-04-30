@@ -33,7 +33,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="arduino-linear-classifier-demo.html" /> 
+    <link rel="prev" title="Linear classifier Demostration" href="arduino-linear-classifier-demo.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -42,7 +42,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="arduino-linear-classifier-demo.html" title="&lt;no title&gt;"
+          <a href="arduino-linear-classifier-demo.html" title="Linear classifier Demostration"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Two-Layer Fully Conected Neural Network</a></li> 
@@ -270,14 +270,10 @@
 </div>
 </div>
 </section>
-<section id="example-1">
-<h2>Example 1<a class="headerlink" href="#example-1" title="Link to this heading">¶</a></h2>
-</section>
-<section id="breast-cancer-wisconsin">
-<h2>Breast Cancer Wisconsin<a class="headerlink" href="#breast-cancer-wisconsin" title="Link to this heading">¶</a></h2>
+<section id="example-1-breast-cancer-wisconsin">
+<h2>Example 1: Breast Cancer Wisconsin<a class="headerlink" href="#example-1-breast-cancer-wisconsin" title="Link to this heading">¶</a></h2>
 <p>https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic</p>
-<section id="load-training-and-test-dataset">
-<h3>Load training and test dataset<a class="headerlink" href="#load-training-and-test-dataset" title="Link to this heading">¶</a></h3>
+<p>Load training and test dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;./datasets/breast_cancer/wdbc.data&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
@@ -306,7 +302,7 @@ Labels            : [0 1]
 </div>
 </div>
 </div>
-<p>Split the data into train and test datasets.</p>
+<p>Split the data into train and test datasets:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">400</span><span class="p">,</span> <span class="p">:]</span>
@@ -319,9 +315,6 @@ Labels            : [0 1]
 </div>
 </div>
 </div>
-</section>
-<section id="setup-the-parameters">
-<h3>Setup the parameters<a class="headerlink" href="#setup-the-parameters" title="Link to this heading">¶</a></h3>
 <p>These are some hyperparameters that we need to tune. A new parameter called: hidden_size descirbes how many neurons in the hidden layer.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">100</span><span class="err">`</span> <span class="c1"># Try 20, 25, 50, 100</span>
 <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="err">`</span> <span class="c1"># Try 1e-5, 1e-4</span>
@@ -346,8 +339,12 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.92
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.925
 Validation accuracy :  0.875
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_125326/1743360196.py:72: RuntimeWarning: divide by zero encountered in log
+  loss = np.sum(-np.log(softmax[range(N),Y])) / N + reg  * (np.sum(W2 * W2) + np.sum( W1 * W1 ))
 </pre></div>
 </div>
 </div>
@@ -362,14 +359,13 @@ Validation accuracy :  0.875
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/0e56f628f648a27637b4bbb82f4337523e1c589f30668468cbc709482fdbfc9b.png" src="_images/0e56f628f648a27637b4bbb82f4337523e1c589f30668468cbc709482fdbfc9b.png" />
+<img alt="_images/fab034a428bbd273e2591e56f94044eb6c776074625b1bd88093d128cac149a2.png" src="_images/fab034a428bbd273e2591e56f94044eb6c776074625b1bd88093d128cac149a2.png" />
 </div>
 </div>
-</section>
 </section>
 <hr class="docutils" />
-<section id="handwritten-digits">
-<h2>Handwritten Digits<a class="headerlink" href="#handwritten-digits" title="Link to this heading">¶</a></h2>
+<section id="example-2-handwritten-digits">
+<h2>Example 2: Handwritten Digits<a class="headerlink" href="#example-2-handwritten-digits" title="Link to this heading">¶</a></h2>
 <p>This dataset is publicly available and can be downloaded from <a class="reference external" href="https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits">this link</a>.</p>
 <p>Let us start with the train dataset:</p>
 <div class="cell docutils container">
@@ -458,8 +454,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9903217368558723
-Test accuracy     :  0.9593767390094602
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9895370128171593
+Test accuracy     :  0.9582637729549248
 </pre></div>
 </div>
 </div>
@@ -474,7 +470,7 @@ Test accuracy     :  0.9593767390094602
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/829d40fbc45e7f088fb2b816d267e98d130a60256a0a326224e8cff753a0d61a.png" src="_images/829d40fbc45e7f088fb2b816d267e98d130a60256a0a326224e8cff753a0d61a.png" />
+<img alt="_images/4c7e991813a8c9dae80680704b9b1d74330e3a4a4eb9883d44f8c5e99cc9d11d.png" src="_images/4c7e991813a8c9dae80680704b9b1d74330e3a4a4eb9883d44f8c5e99cc9d11d.png" />
 </div>
 </div>
 </section>
@@ -516,13 +512,8 @@ Test accuracy     :  0.9593767390094602
 <li><a class="reference internal" href="#preparations">Preparations</a></li>
 <li><a class="reference internal" href="#diagram-of-the-neural-network">Diagram of the neural network</a></li>
 <li><a class="reference internal" href="#class-twolayernet">class TwoLayerNet</a></li>
-<li><a class="reference internal" href="#example-1">Example 1</a></li>
-<li><a class="reference internal" href="#breast-cancer-wisconsin">Breast Cancer Wisconsin</a><ul>
-<li><a class="reference internal" href="#load-training-and-test-dataset">Load training and test dataset</a></li>
-<li><a class="reference internal" href="#setup-the-parameters">Setup the parameters</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#handwritten-digits">Handwritten Digits</a></li>
+<li><a class="reference internal" href="#example-1-breast-cancer-wisconsin">Example 1: Breast Cancer Wisconsin</a></li>
+<li><a class="reference internal" href="#example-2-handwritten-digits">Example 2: Handwritten Digits</a></li>
 </ul>
 </li>
 </ul>
@@ -531,7 +522,7 @@ Test accuracy     :  0.9593767390094602
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="arduino-linear-classifier-demo.html"
-                          title="previous chapter">&lt;no title&gt;</a></p>
+                          title="previous chapter">Linear classifier Demostration</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -561,7 +552,7 @@ Test accuracy     :  0.9593767390094602
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="arduino-linear-classifier-demo.html" title="&lt;no title&gt;"
+          <a href="arduino-linear-classifier-demo.html" title="Linear classifier Demostration"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Two-Layer Fully Conected Neural Network</a></li> 
