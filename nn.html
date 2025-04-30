@@ -316,9 +316,9 @@ Labels            : [0 1]
 </div>
 </div>
 <p>These are some hyperparameters that we need to tune. A new parameter called: hidden_size descirbes how many neurons in the hidden layer.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">100</span><span class="err">`</span> <span class="c1"># Try 20, 25, 50, 100</span>
-<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="err">`</span> <span class="c1"># Try 1e-5, 1e-4</span>
-<span class="n">reg</span> <span class="o">=</span> <span class="mf">0.01</span><span class="err">`</span><span class="c1"># Try 0.1, 0.01. 0.001. 0.0001, 0</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># Try 20, 25, 50, 100</span>
+<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="c1"># Try 1e-5, 1e-4</span>
+<span class="n">reg</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c1"># Try 0.1, 0.01. 0.001. 0.0001, 0</span>
 </pre></div>
 </div>
 <div class="cell docutils container">
@@ -339,12 +339,8 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.925
-Validation accuracy :  0.875
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_125326/1743360196.py:72: RuntimeWarning: divide by zero encountered in log
-  loss = np.sum(-np.log(softmax[range(N),Y])) / N + reg  * (np.sum(W2 * W2) + np.sum( W1 * W1 ))
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.92
+Validation accuracy :  0.8809523809523809
 </pre></div>
 </div>
 </div>
@@ -359,7 +355,7 @@ Validation accuracy :  0.875
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/fab034a428bbd273e2591e56f94044eb6c776074625b1bd88093d128cac149a2.png" src="_images/fab034a428bbd273e2591e56f94044eb6c776074625b1bd88093d128cac149a2.png" />
+<img alt="_images/5bf7ccb319efd77c78a4ad3d053f9d795cbe6376756b326a77993386953d46c8.png" src="_images/5bf7ccb319efd77c78a4ad3d053f9d795cbe6376756b326a77993386953d46c8.png" />
 </div>
 </div>
 </section>
@@ -454,8 +450,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9895370128171593
-Test accuracy     :  0.9582637729549248
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9905833115354433
+Test accuracy     :  0.9621591541457986
 </pre></div>
 </div>
 </div>
@@ -470,7 +466,7 @@ Test accuracy     :  0.9582637729549248
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/4c7e991813a8c9dae80680704b9b1d74330e3a4a4eb9883d44f8c5e99cc9d11d.png" src="_images/4c7e991813a8c9dae80680704b9b1d74330e3a4a4eb9883d44f8c5e99cc9d11d.png" />
+<img alt="_images/6174322899c0fe6aed7f9b590defea8ae64a6da8b6f99f19675c3ffa806d0f3f.png" src="_images/6174322899c0fe6aed7f9b590defea8ae64a6da8b6f99f19675c3ffa806d0f3f.png" />
 </div>
 </div>
 </section>
