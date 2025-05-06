@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Two-Layer Fully Conected Neural Network &#8212; AEK3LBB3</title>
+    <title>Two-Layer Fully Connected Neural Network &#8212; AEK3LBB3</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
@@ -33,6 +33,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Two-Layer Fully Connected Demonstration" href="arduino_mlp_classifier.html" />
     <link rel="prev" title="Linear classifier Demostration" href="arduino-linear-classifier-demo.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
@@ -42,10 +43,13 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="arduino_mlp_classifier.html" title="Two-Layer Fully Connected Demonstration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
           <a href="arduino-linear-classifier-demo.html" title="Linear classifier Demostration"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Two-Layer Fully Conected Neural Network</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Two-Layer Fully Connected Neural Network</a></li> 
       </ul>
     </div>  
 
@@ -54,8 +58,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section class="tex2jax_ignore mathjax_ignore" id="two-layer-fully-conected-neural-network">
-<h1>Two-Layer Fully Conected Neural Network<a class="headerlink" href="#two-layer-fully-conected-neural-network" title="Link to this heading">¶</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="two-layer-fully-connected-neural-network">
+<h1>Two-Layer Fully Connected Neural Network<a class="headerlink" href="#two-layer-fully-connected-neural-network" title="Link to this heading">¶</a></h1>
 <p><strong>This material is heavily based on the popular Standford CS231n lecture material.</strong> <a class="reference external" href="https://cs231n.github.io/">Please check on their website for more detailed information</a>.</p>
 <section id="preparations">
 <h2>Preparations<a class="headerlink" href="#preparations" title="Link to this heading">¶</a></h2>
@@ -339,8 +343,12 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.92
-Validation accuracy :  0.8809523809523809
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.8975
+Validation accuracy :  0.8511904761904762
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_102586/1743360196.py:72: RuntimeWarning: divide by zero encountered in log
+  loss = np.sum(-np.log(softmax[range(N),Y])) / N + reg  * (np.sum(W2 * W2) + np.sum( W1 * W1 ))
 </pre></div>
 </div>
 </div>
@@ -355,7 +363,7 @@ Validation accuracy :  0.8809523809523809
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/5bf7ccb319efd77c78a4ad3d053f9d795cbe6376756b326a77993386953d46c8.png" src="_images/5bf7ccb319efd77c78a4ad3d053f9d795cbe6376756b326a77993386953d46c8.png" />
+<img alt="_images/3e56b83aebd5888e4b8b88d45bb150dfb4dad95752eb6e707e7775def3c8c45f.png" src="_images/3e56b83aebd5888e4b8b88d45bb150dfb4dad95752eb6e707e7775def3c8c45f.png" />
 </div>
 </div>
 </section>
@@ -435,6 +443,12 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_102586/1743360196.py:72: RuntimeWarning: divide by zero encountered in log
+  loss = np.sum(-np.log(softmax[range(N),Y])) / N + reg  * (np.sum(W2 * W2) + np.sum( W1 * W1 ))
+</pre></div>
+</div>
+</div>
 </div>
 <p>Next, we check the accuray for training and test dataset.</p>
 <div class="cell docutils container">
@@ -450,8 +464,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9905833115354433
-Test accuracy     :  0.9621591541457986
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.3531258174208737
+Test accuracy     :  0.34168057874234836
 </pre></div>
 </div>
 </div>
@@ -466,7 +480,7 @@ Test accuracy     :  0.9621591541457986
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/6174322899c0fe6aed7f9b590defea8ae64a6da8b6f99f19675c3ffa806d0f3f.png" src="_images/6174322899c0fe6aed7f9b590defea8ae64a6da8b6f99f19675c3ffa806d0f3f.png" />
+<img alt="_images/e08a959f6ac1a0ace2e16670516580a4555fff9fc244963aaf55a8baf4c6c3b0.png" src="_images/e08a959f6ac1a0ace2e16670516580a4555fff9fc244963aaf55a8baf4c6c3b0.png" />
 </div>
 </div>
 </section>
@@ -504,7 +518,7 @@ Test accuracy     :  0.9621591541457986
   <div>
     <h3><a href="intro.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Two-Layer Fully Conected Neural Network</a><ul>
+<li><a class="reference internal" href="#">Two-Layer Fully Connected Neural Network</a><ul>
 <li><a class="reference internal" href="#preparations">Preparations</a></li>
 <li><a class="reference internal" href="#diagram-of-the-neural-network">Diagram of the neural network</a></li>
 <li><a class="reference internal" href="#class-twolayernet">class TwoLayerNet</a></li>
@@ -519,6 +533,11 @@ Test accuracy     :  0.9621591541457986
     <h4>Previous topic</h4>
     <p class="topless"><a href="arduino-linear-classifier-demo.html"
                           title="previous chapter">Linear classifier Demostration</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="arduino_mlp_classifier.html"
+                          title="next chapter">Two-Layer Fully Connected Demonstration</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -548,10 +567,13 @@ Test accuracy     :  0.9621591541457986
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="arduino_mlp_classifier.html" title="Two-Layer Fully Connected Demonstration"
+             >next</a> |</li>
+        <li class="right" >
           <a href="arduino-linear-classifier-demo.html" title="Linear classifier Demostration"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Two-Layer Fully Conected Neural Network</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Two-Layer Fully Connected Neural Network</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
