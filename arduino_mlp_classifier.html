@@ -5,15 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Arduino Demonstration for Two-Layer Fully Connected Nerural Network &#8212; AEK3LBB3</title>
+    <title>Demo-2: Two-Layer Fully Connected Network with Arduino &#8212; AEK3LBB3</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="_static/traditional.css?v=608ddc6c" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
-    
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -30,10 +29,9 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Two-Layer Fully Connected Neural Network" href="nn.html" /> 
+    <link rel="prev" title="Demo-1: Linear Classifiers with Arduino" href="arduino_linear_classifier.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -42,10 +40,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="nn.html" title="Two-Layer Fully Connected Neural Network"
+          <a href="arduino_linear_classifier.html" title="Demo-1: Linear Classifiers with Arduino"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Arduino Demonstration for Two-Layer Fully Connected Nerural Network</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Demo-2: Two-Layer Fully Connected Network with Arduino</a></li> 
       </ul>
     </div>  
 
@@ -54,11 +52,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section class="tex2jax_ignore mathjax_ignore" id="arduino-demonstration-for-two-layer-fully-connected-nerural-network">
-<h1>Arduino Demonstration for Two-Layer Fully Connected Nerural Network<a class="headerlink" href="#arduino-demonstration-for-two-layer-fully-connected-nerural-network" title="Link to this heading">¶</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="demo-2-two-layer-fully-connected-network-with-arduino">
+<h1>Demo-2: Two-Layer Fully Connected Network with Arduino<a class="headerlink" href="#demo-2-two-layer-fully-connected-network-with-arduino" title="Link to this heading">¶</a></h1>
 <section id="arduino-code-repository">
 <h2>Arduino Code repository<a class="headerlink" href="#arduino-code-repository" title="Link to this heading">¶</a></h2>
-<p>https://github.com/auralius/arduino-linear-classifier/tree/main</p>
+<p>Even though <strong>this method is no longer a linear method</strong>, we will put the Arduino codes in the same repository.</p>
+<p><a class="reference external" href="https://github.com/auralius/arduino-linear-classifier">https://github.com/auralius/arduino-linear-classifier</a></p>
 <p>Check the <code class="docutils literal notranslate"><span class="pre">fcnn</span></code> folder.</p>
 <p><img alt="" src="_images/demo_fcnn.gif" /></p>
 </section>
@@ -276,6 +275,7 @@
 <p>The USPS dataset is a little more suitable for our implementation then the MNIST dataset. Images in the USPS dataset are wrapped as tightly as possible inside their bounding boxes. Thus, every image is centered at the center of its bounding box. As for images in the MNIST dataset, they are not tightly wrapped. Each image is centered its center of mass. Finding center of mass of an image is considerably very resource demanding for a general low-cost microcontoller that we will use.</p>
 <p>The USPS dataset can be found here:</p>
 <p>https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass.html#usps</p>
+<p><img alt="image.png" src="attachment:image.png" /></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">h5py</span>
@@ -360,7 +360,7 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/d1c15b91e3c3fc841b83c6031d137cb57108161d5ef15f9f6f63602b05a8916b.png" src="_images/d1c15b91e3c3fc841b83c6031d137cb57108161d5ef15f9f6f63602b05a8916b.png" />
+<img alt="_images/a4c9e69e83a6d33527c40e190172aa6bf6cec87765310b226ee8bf146568fa13.png" src="_images/a4c9e69e83a6d33527c40e190172aa6bf6cec87765310b226ee8bf146568fa13.png" />
 </div>
 </div>
 </section>
@@ -379,8 +379,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9790152242490742
-Test accuracy     :  0.9287493771798705
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9797010012343986
+Test accuracy     :  0.9302441454907823
 </pre></div>
 </div>
 </div>
@@ -458,7 +458,7 @@ Test accuracy     :  0.9287493771798705
   <div>
     <h3><a href="intro.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Arduino Demonstration for Two-Layer Fully Connected Nerural Network</a><ul>
+<li><a class="reference internal" href="#">Demo-2: Two-Layer Fully Connected Network with Arduino</a><ul>
 <li><a class="reference internal" href="#arduino-code-repository">Arduino Code repository</a></li>
 <li><a class="reference internal" href="#preparations">Preparations</a><ul>
 <li><a class="reference internal" href="#the-twolayernet-class">The TwoLayerNet class</a></li>
@@ -475,8 +475,8 @@ Test accuracy     :  0.9287493771798705
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="nn.html"
-                          title="previous chapter">Two-Layer Fully Connected Neural Network</a></p>
+    <p class="topless"><a href="arduino_linear_classifier.html"
+                          title="previous chapter">Demo-1: Linear Classifiers with Arduino</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -506,10 +506,10 @@ Test accuracy     :  0.9287493771798705
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="nn.html" title="Two-Layer Fully Connected Neural Network"
+          <a href="arduino_linear_classifier.html" title="Demo-1: Linear Classifiers with Arduino"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Arduino Demonstration for Two-Layer Fully Connected Nerural Network</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Demo-2: Two-Layer Fully Connected Network with Arduino</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

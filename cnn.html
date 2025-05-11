@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Convolutional Neural Network with Pre-Convolved Input &#8212; AEK3LBB3</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/traditional.css?v=608ddc6c" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Demo-1: Linear Classifiers with Arduino" href="arduino_linear_classifier.html" />
+    <link rel="prev" title="Two-Layer Fully Connected Neural Network" href="nn.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="arduino_linear_classifier.html" title="Demo-1: Linear Classifiers with Arduino"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nn.html" title="Two-Layer Fully Connected Neural Network"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Convolutional Neural Network with Pre-Convolved Input</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="convolutional-neural-network-with-pre-convolved-input">
+<h1>Convolutional Neural Network with Pre-Convolved Input<a class="headerlink" href="#convolutional-neural-network-with-pre-convolved-input" title="Link to this heading">¶</a></h1>
+<p><strong>This material is heavily based on the popular Standford CS231n lecture material.</strong> <a class="reference external" href="https://cs231n.github.io/">Please check on their website for more detailed information</a>.</p>
+<p>However, in this sectio, we are only going to implement the simplified version of a CNN. First, we will apply preconvolution to all training and testing datasets. Next, we will use the pre-convolved images to train a two-layer fully connected Neural Network.</p>
+<p>In summary, the main difference is in how the network is trained (the backward pass). As for the forward pass, it is nevertheless similar to a CNN.</p>
+<section id="preparations">
+<h2>Preparations<a class="headerlink" href="#preparations" title="Link to this heading">¶</a></h2>
+<p>As usual, let’s start with some preparations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;sans-serif&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Link to this heading">¶</a></h2>
+<p>We will use the USPS dataset that can be found <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass.html#usps">in this link.</a></p>
+<p><img alt="image.png" src="attachment:image.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">h5py</span>
+<span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s2">&quot;./datasets/usps/usps.h5&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hf</span><span class="p">:</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)[:]</span> <span class="o">*</span> <span class="mf">255.0</span>
+    <span class="n">Y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">)[:])</span> 
+
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)[:]</span> <span class="o">*</span> <span class="mf">255.0</span>
+    <span class="n">Y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">)[:])</span> 
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 256
+Number of data    : 7291
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="border-padding">
+<h2>Border Padding<a class="headerlink" href="#border-padding" title="Link to this heading">¶</a></h2>
+<p>Here, we are going to pad the image border with zeros to avoid information loss around at the border.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train_paded</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X_train</span><span class="p">:</span>
+    <span class="n">x_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">18</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+    <span class="n">x_</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">X_train_paded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">X_test_padded</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X_test</span><span class="p">:</span>
+    <span class="n">x_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">18</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+    <span class="n">x_</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">X_test_padded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="image-convolutions">
+<h2>Image Convolutions<a class="headerlink" href="#image-convolutions" title="Link to this heading">¶</a></h2>
+<p>We are going to do a simple average pooling (analogous to image smoothing). Simply put, the filter matrix is a matrix of ones.</p>
+<p>The convolution function is as follows, where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">img_in</span></code> is the image as a 2D matrix</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dim</span></code> is the dimesion of the filter: <code class="docutils literal notranslate"><span class="pre">[number</span> <span class="pre">of</span> <span class="pre">rows,</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">coluns]</span> </code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s</span></code> is the stride number</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">convolve_image</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="n">nr</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="o">=</span> <span class="n">img_in</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nr</span><span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nc</span><span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">)])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+            <span class="n">img_out</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">img_in</span><span class="p">[</span><span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">+</span><span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">:</span><span class="n">c</span><span class="o">+</span><span class="n">dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">img_out</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img_out</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">img_out</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is the similar function for an image that is stored as a 1D array (flattened)).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">convolve_flattened_image</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">nr</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nr</span> <span class="o">-</span> <span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nc</span> <span class="o">-</span> <span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+    <span class="n">nr_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">);</span>
+    <span class="n">nc_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">);</span>
+    
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nr_</span> <span class="o">*</span> <span class="n">nc_</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">img_out</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">nc_</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_out</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">nc_</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">img_in</span><span class="p">[(</span><span class="n">r</span><span class="o">+</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">nc</span> <span class="o">+</span> <span class="p">(</span><span class="n">l</span><span class="o">+</span><span class="n">c</span><span class="p">)]</span>
+
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">img_out</span><span class="o">/</span><span class="p">(</span><span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">img_out</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img_out</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">img_out</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s now do the convolution. The dimension of the filter matrix is 2x2 and the stride is 2.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">f1</span> <span class="o">=</span> <span class="s2">&quot;./X_train_conv.txt&quot;</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="s2">&quot;./X_test_conv.txt&quot;</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">f1</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">f2</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="s2">&quot;ab&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X_train_paded</span><span class="p">:</span>
+        <span class="n">img_out</span> <span class="o">=</span> <span class="n">convolve_image</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">),</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#img_out = convolve_flattened_image(x.flatten(), 18, 18, [2,2], 2)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img_out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="s2">&quot;ab&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X_test_padded</span><span class="p">:</span>
+        <span class="n">img_out</span> <span class="o">=</span> <span class="n">convolve_image</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">),</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#img_out = convolve_flattened_image(x.flatten(), 18, 18, [2,2], 2)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img_out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">14</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="s2">&quot;ab&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span>     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X_train_paded</span><span class="p">:</span>
+<span class="ne">---&gt; </span><span class="mi">14</span>         <span class="n">img_out</span> <span class="o">=</span> <span class="n">convolve_image</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">),</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>         <span class="c1">#img_out = convolve_flattened_image(x.flatten(), 18, 18, [2,2], 2)</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span>         <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img_out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="ne">ValueError</span>: cannot reshape array of size 324 into shape (16,16)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="diagram-of-the-neural-network">
+<h2>Diagram of the neural network<a class="headerlink" href="#diagram-of-the-neural-network" title="Link to this heading">¶</a></h2>
+<p><img alt="" src="_images/2fcnn.png" /></p>
+</section>
+<section id="class-twolayernet">
+<h2>class TwoLayerNet<a class="headerlink" href="#class-twolayernet" title="Link to this heading">¶</a></h2>
+<p>Here, we are using the the ScyPy instead of our previous gradient descent method. There are: <code class="docutils literal notranslate"><span class="pre">D*H+H*C+H+C</span></code> variables that we must solve. For this reasons, our vanilla gradient descent method often gives unsatisfactory results.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TwoLayerNet</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A two-layer fully-connected neural network. The net has an input dimension of</span>
+<span class="sd">    N, a hidden layer dimension of H, and performs classification over C classes.</span>
+<span class="sd">    We train the network with a softmax loss function and L2 regularization on the</span>
+<span class="sd">    weight matrices. The network uses a ReLU nonlinearity after the first fully</span>
+<span class="sd">    connected layer.</span>
+
+<span class="sd">    In other words, the network has the following architecture:</span>
+
+<span class="sd">    input - fully connected layer - ReLU - fully connected layer - softmax</span>
+
+<span class="sd">    The outputs of the second fully-connected layer are the scores for each class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the model. Weights are initialized to small random values and</span>
+<span class="sd">        biases are initialized to zero. Weights and biases are stored in the</span>
+<span class="sd">        variable self.params, which is a dictionary with the following keys:</span>
+
+<span class="sd">        W1: First layer weights; has shape (D, H)</span>
+<span class="sd">        b1: First layer biases; has shape (H,)</span>
+<span class="sd">        W2: Second layer weights; has shape (H, C)</span>
+<span class="sd">        b2: Second layer biases; has shape (C,)</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">        - input_size: The dimension D of the input data.</span>
+<span class="sd">        - hidden_size: The number of neurons H in the hidden layer.</span>
+<span class="sd">        - output_size: The number of classes C.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">output_size</span><span class="p">)</span>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">grad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the loss and gradients for a two layer fully connected neural</span>
+<span class="sd">        network.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">        - X: Input data of shape (N, D). Each X[i] is a training sample.</span>
+<span class="sd">        - Y: Vector of training labels. Y[i] is the label for X[i], and each y[i] is</span>
+<span class="sd">        an integer in the range 0 &lt;= Y[i] &lt; C. This parameter is optional; if it</span>
+<span class="sd">        is not passed then we only return scores, and if it is passed then we</span>
+<span class="sd">        instead return the loss and gradients.</span>
+<span class="sd">        - reg: Regularization strength.</span>
+<span class="sd">        - grad: flag to or NOT to return the loss gradients</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - loss: Loss (data loss and regularization loss) for this batch of training</span>
+<span class="sd">        samples.</span>
+<span class="sd">        - grads: Dictionary mapping parameter names to gradients of those parameters</span>
+<span class="sd">        with respect to the loss function; has the same keys as self.params.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># Compute the forward pass</span>
+        <span class="n">fc1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span>     <span class="c1"># fully connected</span>
+        <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">fc1</span><span class="p">)</span>  <span class="c1"># ReLU</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">X2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span> <span class="c1"># fully connected</span>
+        
+        <span class="c1"># Compute the loss </span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">F</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">expF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+        <span class="n">softmax</span> <span class="o">=</span> <span class="n">expF</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">expF</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> 
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">softmax</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span><span class="n">Y</span><span class="p">]))</span> <span class="o">/</span> <span class="n">N</span> <span class="o">+</span> <span class="n">reg</span>  <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">W2</span> <span class="o">*</span> <span class="n">W2</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">W1</span> <span class="o">*</span> <span class="n">W1</span> <span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">grad</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span> <span class="c1"># loss gradient is optionals</span>
+            <span class="c1"># Backward pass: compute gradients</span>
+            <span class="n">softmax</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="p">,</span><span class="n">Y</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">softmax</span> <span class="o">/=</span> <span class="n">N</span>
+
+            <span class="c1"># W2 gradient</span>
+            <span class="n">dW2</span> <span class="o">=</span> <span class="n">X2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">softmax</span><span class="p">)</span>   <span class="c1"># [HxN] * [NxC] = [HxC]</span>
+
+            <span class="c1"># b2 gradient</span>
+            <span class="n">db2</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># W1 gradient</span>
+            <span class="n">dW1</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>   <span class="c1"># [NxC] * [CxH] = [NxH]</span>
+            <span class="n">dfc1</span> <span class="o">=</span> <span class="n">dW1</span> <span class="o">*</span> <span class="p">(</span><span class="n">fc1</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span>      <span class="c1"># [NxH] . [NxH] = [NxH]</span>
+            <span class="n">dW1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dfc1</span><span class="p">)</span>       <span class="c1"># [DxN] * [NxH] = [DxH]</span>
+
+            <span class="c1"># b1 gradient</span>
+            <span class="n">db1</span> <span class="o">=</span> <span class="n">dfc1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># regularization gradient</span>
+            <span class="n">dW1</span> <span class="o">+=</span> <span class="n">reg</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">W1</span>
+            <span class="n">dW2</span> <span class="o">+=</span> <span class="n">reg</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">W2</span>
+
+            <span class="n">dW</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">dW1</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">db1</span><span class="p">,</span> <span class="n">dW2</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">db2</span><span class="p">))</span>
+        
+            <span class="k">return</span> <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">dW</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">loss</span>
+
+
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train this neural network using stochastic gradient descent.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">        - X: A numpy array of shape (N, D) giving training data.</span>
+<span class="sd">        - y: A numpy array f shape (N,) giving training labels; y[i] = c means that</span>
+<span class="sd">        X[i] has label c, where 0 &lt;= c &lt; C.</span>
+<span class="sd">        - X_val: A numpy array of shape (N_val, D) giving validation data.</span>
+<span class="sd">        - y_val: A numpy array of shape (N_val,) giving validation labels.</span>
+<span class="sd">        - reg: Scalar giving regularization strength.</span>
+<span class="sd">        - num_iters: Number of steps to take when optimizing.</span>
+<span class="sd">        - verbose: boolean; if true print progress during optimization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;loss_history&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">D</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">H</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">W1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">H</span><span class="p">)</span>
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="p">:</span> <span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">]</span>
+            <span class="n">W2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">:</span> <span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="o">+</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">C</span><span class="p">)]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+            <span class="n">b2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="o">+</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">C</span><span class="p">):]</span>
+
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span> <span class="n">grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;loss_history&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">loss</span>
+
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b1&#39;</span><span class="p">],</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b2&#39;</span><span class="p">]))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;L-BFGS-B&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="n">gtol</span><span class="p">,</span> <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="n">maxiter</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;W1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">H</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;b1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="p">:</span> <span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;W2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="p">:</span> <span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="o">+</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">C</span><span class="p">)]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;b2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">D</span><span class="o">*</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="o">+</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">C</span><span class="p">):]</span>
+    
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use the trained weights of this two-layer network to predict labels for</span>
+<span class="sd">        data points. For each data point we predict scores for each of the C</span>
+<span class="sd">        classes, and assign each data point to the class with the highest score.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">        - X: A numpy array of shape (N, D) giving N D-dimensional data points to</span>
+<span class="sd">        classify.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - Y_pred: A numpy array of shape (N,) giving predicted labels for each of</span>
+<span class="sd">        the elements of X. For all i, y_pred[i] = c means that X[i] is predicted</span>
+<span class="sd">        to have class c, where 0 &lt;= c &lt; C.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Unpack variables from the params dictionary</span>
+        <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W1&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b1&#39;</span><span class="p">]</span>
+        <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;W2&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b2&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Compute the forward pass</span>
+        <span class="n">fc1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span>     <span class="c1"># fully connected</span>
+        <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">fc1</span><span class="p">)</span>  <span class="c1"># ReLU</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">X2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span> <span class="c1"># fully connected</span>
+    
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span> <span class="n">scores</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">y_pred</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="handwritten-digits">
+<h2>Handwritten Digits<a class="headerlink" href="#handwritten-digits" title="Link to this heading">¶</a></h2>
+<p>This dataset is publicly available and can be downloaded from <a class="reference external" href="https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits">this link</a>.</p>
+<p>Let us start with the train dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">X_train_conv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">X_train_conv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels            :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y_train</span><span class="p">))</span>
+
+<span class="c1"># For the NN</span>
+<span class="n">input_size</span>  <span class="o">=</span> <span class="n">X_train_conv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y_train</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 64
+Number of data    : 7291
+Labels            : [0 1 2 3 4 5 6 7 8 9]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_test_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">X_test_conv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">X_test_conv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels            :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y_test</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 64
+Number of data    : 2007
+Labels            : [0 1 2 3 4 5 6 7 8 9]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-convolved-images">
+<h2>The Convolved Images<a class="headerlink" href="#the-convolved-images" title="Link to this heading">¶</a></h2>
+<p>Here, we are going to plot some of the convolved images.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">X_train_conv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">):</span>
+    <span class="n">X_train_conv_</span> <span class="o">=</span> <span class="n">X_train_conv</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Rescale the weights to be between 0 and 255</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X_train_conv_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/8bdd7d3d4cd7e05af135ace1d5dd35ba58da63d68649acd06abb0a9896dff5cb.png" src="_images/8bdd7d3d4cd7e05af135ace1d5dd35ba58da63d68649acd06abb0a9896dff5cb.png" />
+</div>
+</div>
+</section>
+<section id="the-original-images">
+<h2>The Original Images<a class="headerlink" href="#the-original-images" title="Link to this heading">¶</a></h2>
+<p>For comparison, let’s plot some of the original images.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">):</span>
+    <span class="n">X_train_</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Rescale the weights to be between 0 and 255</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X_train_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/9c35ba2bc34e07977feaa6b39cc5cb63e9d7b9696579b72af6bee326ec8afa0d.png" src="_images/9c35ba2bc34e07977feaa6b39cc5cb63e9d7b9696579b72af6bee326ec8afa0d.png" />
+</div>
+</div>
+</section>
+<section id="training-and-testing-the-neural-network">
+<h2>Training and Testing the Neural Network<a class="headerlink" href="#training-and-testing-the-neural-network" title="Link to this heading">¶</a></h2>
+<p>Now, let us setup and then train the neural network.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">TwoLayerNet</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train_conv</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we check the accuray for training and test dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Predict on the validation set</span>
+<span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_conv</span><span class="p">)</span> <span class="o">==</span> <span class="n">Y_train</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training accuracy : &#39;</span><span class="p">,</span> <span class="n">train_acc</span><span class="p">)</span>
+
+<span class="c1"># Predict on the test set</span>
+<span class="n">test_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_conv</span><span class="p">)</span> <span class="o">==</span> <span class="n">Y_test</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Test accuracy     : &#39;</span><span class="p">,</span> <span class="n">test_acc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9875188588670964
+Test accuracy     :  0.9157947184853015
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;loss_history&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration number&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss value&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/412483095fce880f72c3749716db840e1163129971b2a4ba50d8267dd7c101fa.png" src="_images/412483095fce880f72c3749716db840e1163129971b2a4ba50d8267dd7c101fa.png" />
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "py.3.12.4"
+        },
+        kernelOptions: {
+            name: "py.3.12.4",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'py.3.12.4'</script>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="intro.html">
+              <img class="logo" src="_static/logo.png" alt="Logo of Project name not set"/>
+            </a></p>
+  <div>
+    <h3><a href="intro.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Convolutional Neural Network with Pre-Convolved Input</a><ul>
+<li><a class="reference internal" href="#preparations">Preparations</a></li>
+<li><a class="reference internal" href="#dataset">Dataset</a></li>
+<li><a class="reference internal" href="#border-padding">Border Padding</a></li>
+<li><a class="reference internal" href="#image-convolutions">Image Convolutions</a></li>
+<li><a class="reference internal" href="#diagram-of-the-neural-network">Diagram of the neural network</a></li>
+<li><a class="reference internal" href="#class-twolayernet">class TwoLayerNet</a></li>
+<li><a class="reference internal" href="#handwritten-digits">Handwritten Digits</a></li>
+<li><a class="reference internal" href="#the-convolved-images">The Convolved Images</a></li>
+<li><a class="reference internal" href="#the-original-images">The Original Images</a></li>
+<li><a class="reference internal" href="#training-and-testing-the-neural-network">Training and Testing the Neural Network</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="nn.html"
+                          title="previous chapter">Two-Layer Fully Connected Neural Network</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="arduino_linear_classifier.html"
+                          title="next chapter">Demo-1: Linear Classifiers with Arduino</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cnn.ipynb"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="arduino_linear_classifier.html" title="Demo-1: Linear Classifiers with Arduino"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nn.html" title="Two-Layer Fully Connected Neural Network"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Convolutional Neural Network with Pre-Convolved Input</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    </div>
+  </body>
+</html>
