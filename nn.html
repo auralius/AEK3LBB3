@@ -31,7 +31,7 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Two-Layer Fully Conected Neural Network" href="cnn.html" />
+    <link rel="next" title="Convolutional Neural Network with Pre-Convolved Input" href="cnn.html" />
     <link rel="prev" title="Softmax Classifier" href="softmax.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
@@ -41,7 +41,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cnn.html" title="Two-Layer Fully Conected Neural Network"
+          <a href="cnn.html" title="Convolutional Neural Network with Pre-Convolved Input"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="softmax.html" title="Softmax Classifier"
@@ -341,12 +341,8 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.8975
-Validation accuracy :  0.8511904761904762
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_102586/1743360196.py:72: RuntimeWarning: divide by zero encountered in log
-  loss = np.sum(-np.log(softmax[range(N),Y])) / N + reg  * (np.sum(W2 * W2) + np.sum( W1 * W1 ))
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.9175
+Validation accuracy :  0.8809523809523809
 </pre></div>
 </div>
 </div>
@@ -361,7 +357,7 @@ Validation accuracy :  0.8511904761904762
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/3e56b83aebd5888e4b8b88d45bb150dfb4dad95752eb6e707e7775def3c8c45f.png" src="_images/3e56b83aebd5888e4b8b88d45bb150dfb4dad95752eb6e707e7775def3c8c45f.png" />
+<img alt="_images/9e667d227431bceee806188a593cb8456360e5b1c234eb51c863846fe4c26e26.png" src="_images/9e667d227431bceee806188a593cb8456360e5b1c234eb51c863846fe4c26e26.png" />
 </div>
 </div>
 </section>
@@ -437,13 +433,7 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="n">net</span> <span class="o">=</span> <span class="n">TwoLayerNet</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
-<span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_102586/1743360196.py:72: RuntimeWarning: divide by zero encountered in log
-  loss = np.sum(-np.log(softmax[range(N),Y])) / N + reg  * (np.sum(W2 * W2) + np.sum( W1 * W1 ))
+<span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -462,8 +452,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.3531258174208737
-Test accuracy     :  0.34168057874234836
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9683494637719069
+Test accuracy     :  0.9426822481914302
 </pre></div>
 </div>
 </div>
@@ -478,7 +468,7 @@ Test accuracy     :  0.34168057874234836
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/e08a959f6ac1a0ace2e16670516580a4555fff9fc244963aaf55a8baf4c6c3b0.png" src="_images/e08a959f6ac1a0ace2e16670516580a4555fff9fc244963aaf55a8baf4c6c3b0.png" />
+<img alt="_images/bf11c80a92fb84ceb5b1a48fd8d93f1daf27c6cd410b409eb57f5bf8acba251f.png" src="_images/bf11c80a92fb84ceb5b1a48fd8d93f1daf27c6cd410b409eb57f5bf8acba251f.png" />
 </div>
 </div>
 </section>
@@ -535,7 +525,7 @@ Test accuracy     :  0.34168057874234836
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="cnn.html"
-                          title="next chapter">Two-Layer Fully Conected Neural Network</a></p>
+                          title="next chapter">Convolutional Neural Network with Pre-Convolved Input</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -565,7 +555,7 @@ Test accuracy     :  0.34168057874234836
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cnn.html" title="Two-Layer Fully Conected Neural Network"
+          <a href="cnn.html" title="Convolutional Neural Network with Pre-Convolved Input"
              >next</a> |</li>
         <li class="right" >
           <a href="softmax.html" title="Softmax Classifier"

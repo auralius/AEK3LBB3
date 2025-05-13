@@ -110,7 +110,9 @@
 <p><strong>Note:</strong> the words “label” and “class” have similar meaning!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SVM</span><span class="p">():</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
+
+<span class="k">class</span> <span class="nc">SVM</span><span class="p">():</span>
     <span class="nd">@staticmethod</span>
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">svm_loss</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="p">):</span>
@@ -201,7 +203,7 @@
 
         <span class="c1"># compute the loss</span>
         <span class="n">L</span>  <span class="o">=</span> <span class="n">F</span> <span class="o">-</span> <span class="n">Fy</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">L</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">a_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="c1"># max(0, ...)</span>
+        <span class="n">L</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span> <span class="c1"># max(0, ...)</span>
         <span class="n">L_</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># keep the original</span>
         <span class="n">L</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="p">,</span> <span class="n">Y</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># exclude the correct labels</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span> <span class="o">+</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">W</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span>
@@ -360,37 +362,37 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 20000: loss 1.184222
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 20000: loss 1.578385
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 2000 / 20000: loss 0.476236
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 2000 / 20000: loss 0.476766
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 4000 / 20000: loss 0.413243
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 4000 / 20000: loss 0.369075
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 6000 / 20000: loss 0.393824
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 6000 / 20000: loss 0.363528
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 8000 / 20000: loss 0.399805
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 8000 / 20000: loss 0.420963
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 / 20000: loss 0.401006
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 / 20000: loss 0.435105
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 12000 / 20000: loss 0.362957
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 12000 / 20000: loss 0.390092
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 14000 / 20000: loss 0.346219
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 14000 / 20000: loss 0.363358
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 16000 / 20000: loss 0.401448
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 16000 / 20000: loss 0.345672
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 18000 / 20000: loss 0.395200
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 18000 / 20000: loss 0.340407
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 19999 / 20000: loss 0.412047
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 19999 / 20000: loss 0.369212
 </pre></div>
 </div>
 </div>
@@ -409,7 +411,7 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/a655e8d1709af4759bb8c5158922cae8a431171ea7a0982314a62455a0121934.png" src="_images/a655e8d1709af4759bb8c5158922cae8a431171ea7a0982314a62455a0121934.png" />
+<img alt="_images/3b35bdcc5e1c22af3ab774a70c1570da1ae9bc667a3e1190394e62f48da97557.png" src="_images/3b35bdcc5e1c22af3ab774a70c1570da1ae9bc667a3e1190394e62f48da97557.png" />
 </div>
 </div>
 </section>
@@ -509,19 +511,19 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 20000: loss 9.164620
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 0 / 20000: loss 8.904625
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 / 20000: loss 0.290134
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 5000 / 20000: loss 0.290021
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 / 20000: loss 0.222276
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 10000 / 20000: loss 0.222661
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 / 20000: loss 0.191145
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 15000 / 20000: loss 0.191569
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 19999 / 20000: loss 0.171738
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>iteration 19999 / 20000: loss 0.172064
 </pre></div>
 </div>
 </div>
@@ -540,7 +542,7 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/d3a37d76345226bf134145b03871fb95ddab86b280efd5736dcaa5fc8e13f2f1.png" src="_images/d3a37d76345226bf134145b03871fb95ddab86b280efd5736dcaa5fc8e13f2f1.png" />
+<img alt="_images/93e16072d2d5bda773bff9dd367f34f476a70f112ac6000307244e2810e93027.png" src="_images/93e16072d2d5bda773bff9dd367f34f476a70f112ac6000307244e2810e93027.png" />
 </div>
 </div>
 </section>
@@ -557,8 +559,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.967303
-validation accuracy: 0.934891
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>training accuracy: 0.966780
+validation accuracy: 0.934335
 </pre></div>
 </div>
 </div>
@@ -589,7 +591,7 @@ validation accuracy: 0.934891
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/555c190720a2f99b56d1977ffb597d902b042b587ad85eed3a6457f1b3cdb857.png" src="_images/555c190720a2f99b56d1977ffb597d902b042b587ad85eed3a6457f1b3cdb857.png" />
+<img alt="_images/75e3d04d5b698924fb6fd5148986e44e0da35154b614916882959c5429907f63.png" src="_images/75e3d04d5b698924fb6fd5148986e44e0da35154b614916882959c5429907f63.png" />
 </div>
 </div>
 </section>
