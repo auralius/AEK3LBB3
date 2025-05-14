@@ -131,7 +131,7 @@
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">grad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">grad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the loss and gradients for a two layer fully connected neural</span>
 <span class="sd">        network.</span>
@@ -194,7 +194,7 @@
         <span class="k">return</span> <span class="n">loss</span>
 
 
-    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Train this neural network using stochastic gradient descent.</span>
 
@@ -319,8 +319,7 @@ Labels            : [0 1]
 </div>
 <p>These are some hyperparameters that we need to tune. A new parameter called: hidden_size descirbes how many neurons in the hidden layer.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># Try 20, 25, 50, 100</span>
-<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="c1"># Try 1e-5, 1e-4</span>
-<span class="n">reg</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c1"># Try 0.1, 0.01. 0.001. 0.0001, 0</span>
+<span class="n">reg</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Try 1.0 or 0.1 or 0.01</span>
 </pre></div>
 </div>
 <div class="cell docutils container">
@@ -328,7 +327,7 @@ Labels            : [0 1]
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">20</span>
 
 <span class="n">net</span> <span class="o">=</span> <span class="n">TwoLayerNet</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
-<span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># Predict on the validation set</span>
 <span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span> <span class="o">==</span> <span class="n">Y_train</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -341,8 +340,8 @@ Labels            : [0 1]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.9175
-Validation accuracy :  0.8809523809523809
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.8725
+Validation accuracy :  0.8630952380952381
 </pre></div>
 </div>
 </div>
@@ -357,7 +356,7 @@ Validation accuracy :  0.8809523809523809
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/9e667d227431bceee806188a593cb8456360e5b1c234eb51c863846fe4c26e26.png" src="_images/9e667d227431bceee806188a593cb8456360e5b1c234eb51c863846fe4c26e26.png" />
+<img alt="_images/e3f4ab33ba85c3a1fa801b785256a0d918bdb590a98bc5ea78436bb92a029f1d.png" src="_images/e3f4ab33ba85c3a1fa801b785256a0d918bdb590a98bc5ea78436bb92a029f1d.png" />
 </div>
 </div>
 </section>
@@ -452,8 +451,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9683494637719069
-Test accuracy     :  0.9426822481914302
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9686110384514779
+Test accuracy     :  0.9415692821368948
 </pre></div>
 </div>
 </div>
@@ -468,7 +467,7 @@ Test accuracy     :  0.9426822481914302
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/bf11c80a92fb84ceb5b1a48fd8d93f1daf27c6cd410b409eb57f5bf8acba251f.png" src="_images/bf11c80a92fb84ceb5b1a48fd8d93f1daf27c6cd410b409eb57f5bf8acba251f.png" />
+<img alt="_images/134673522c00c9d8d81ec889df2acd8b0b7e9d25e29e1988464a8319a96cd66e.png" src="_images/134673522c00c9d8d81ec889df2acd8b0b7e9d25e29e1988464a8319a96cd66e.png" />
 </div>
 </div>
 </section>
