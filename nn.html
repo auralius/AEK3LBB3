@@ -29,9 +29,11 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"HTML-CSS": {"matchFontHeight": true, "scale": 50}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Convolutional Neural Network with Pre-Convolved Input" href="cnn.html" />
+    <link rel="next" title="A Simple CNN with Pre-Convolved Input" href="cnn.html" />
     <link rel="prev" title="Softmax Classifier" href="softmax.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
@@ -41,7 +43,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cnn.html" title="Convolutional Neural Network with Pre-Convolved Input"
+          <a href="cnn.html" title="A Simple CNN with Pre-Convolved Input"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="softmax.html" title="Softmax Classifier"
@@ -223,7 +225,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;loss_history&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
             <span class="k">return</span> <span class="n">loss</span>
 
@@ -356,13 +358,101 @@ Validation accuracy :  0.8630952380952381
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/e3f4ab33ba85c3a1fa801b785256a0d918bdb590a98bc5ea78436bb92a029f1d.png" src="_images/e3f4ab33ba85c3a1fa801b785256a0d918bdb590a98bc5ea78436bb92a029f1d.png" />
+<img alt="_images/945f5f4f03b19b2dd4bfbc239baac424d984625b940eab36f3c8b392ec50d56d.png" src="_images/945f5f4f03b19b2dd4bfbc239baac424d984625b940eab36f3c8b392ec50d56d.png" />
 </div>
 </div>
 </section>
 <hr class="docutils" />
-<section id="example-2-handwritten-digits">
-<h2>Example 2: Handwritten Digits<a class="headerlink" href="#example-2-handwritten-digits" title="Link to this heading">¶</a></h2>
+<section id="example-2-heart-failure-prediction">
+<h2>Example 2: Heart Failure Prediction<a class="headerlink" href="#example-2-heart-failure-prediction" title="Link to this heading">¶</a></h2>
+<p>https://www.kaggle.com/datasets/andrewmvd/heart-failure-clinical-data</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;./datasets/heart_failure/heart_failure_clinical_records_dataset.csv&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span>  <span class="c1"># 12 dimensions</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labels            :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
+
+<span class="c1"># For the NN</span>
+<span class="n">input_size</span>  <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 12
+Number of data    : 299
+Labels            : [0 1]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Standardization:</p>
+<div class="math notranslate nohighlight">
+\[ \mathrm{X_{\text{std}}}=\frac{\mathrm{X}-\text { Mean }}{\text { Standard deviation }} \]</div>
+<p>We need to do standarization because tha numerical data of all features are in different order of magnitude!</p>
+<p><img alt="image.png" src="attachment:image.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">X_train</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">means</span><span class="p">)</span> <span class="o">/</span> <span class="n">stds</span>
+<span class="n">Y_train</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">]</span> 
+
+<span class="n">X_test</span>  <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">201</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">means</span><span class="p">)</span> <span class="o">/</span> <span class="n">stds</span>
+<span class="n">Y_test</span>  <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="mi">201</span><span class="p">:]</span>
+
+<span class="n">num_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">TwoLayerNet</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Predict on the validation set</span>
+<span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span> <span class="o">==</span> <span class="n">Y_train</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training accuracy   : &#39;</span><span class="p">,</span> <span class="n">train_acc</span><span class="p">)</span>
+
+<span class="c1"># Predict on the validation set</span>
+<span class="n">val_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span> <span class="o">==</span> <span class="n">Y_test</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Validation accuracy : &#39;</span><span class="p">,</span> <span class="n">val_acc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy   :  0.88
+Validation accuracy :  0.9183673469387755
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;loss_history&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration number&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss value&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/00b253bab54d6ea371b7dfb0862f5376c22ac654d9956d0033fa822303a0a934.png" src="_images/00b253bab54d6ea371b7dfb0862f5376c22ac654d9956d0033fa822303a0a934.png" />
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="example-3-handwritten-digits">
+<h2>Example 3: Handwritten Digits<a class="headerlink" href="#example-3-handwritten-digits" title="Link to this heading">¶</a></h2>
 <p>This dataset is publicly available and can be downloaded from <a class="reference external" href="https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits">this link</a>.</p>
 <p>Let us start with the train dataset:</p>
 <div class="cell docutils container">
@@ -451,8 +541,8 @@ Labels            : [0 1 2 3 4 5 6 7 8 9]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9686110384514779
-Test accuracy     :  0.9415692821368948
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training accuracy :  0.9665184410149098
+Test accuracy     :  0.9410127991096272
 </pre></div>
 </div>
 </div>
@@ -467,7 +557,7 @@ Test accuracy     :  0.9415692821368948
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/134673522c00c9d8d81ec889df2acd8b0b7e9d25e29e1988464a8319a96cd66e.png" src="_images/134673522c00c9d8d81ec889df2acd8b0b7e9d25e29e1988464a8319a96cd66e.png" />
+<img alt="_images/ec857bab8c4d500a486ab5b7c68ffa40cca2bab6d55ede3af9b05d770b858ba7.png" src="_images/ec857bab8c4d500a486ab5b7c68ffa40cca2bab6d55ede3af9b05d770b858ba7.png" />
 </div>
 </div>
 </section>
@@ -510,7 +600,8 @@ Test accuracy     :  0.9415692821368948
 <li><a class="reference internal" href="#diagram-of-the-neural-network">Diagram of the neural network</a></li>
 <li><a class="reference internal" href="#class-twolayernet">class TwoLayerNet</a></li>
 <li><a class="reference internal" href="#example-1-breast-cancer-wisconsin">Example 1: Breast Cancer Wisconsin</a></li>
-<li><a class="reference internal" href="#example-2-handwritten-digits">Example 2: Handwritten Digits</a></li>
+<li><a class="reference internal" href="#example-2-heart-failure-prediction">Example 2: Heart Failure Prediction</a></li>
+<li><a class="reference internal" href="#example-3-handwritten-digits">Example 3: Handwritten Digits</a></li>
 </ul>
 </li>
 </ul>
@@ -524,7 +615,7 @@ Test accuracy     :  0.9415692821368948
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="cnn.html"
-                          title="next chapter">Convolutional Neural Network with Pre-Convolved Input</a></p>
+                          title="next chapter">A Simple CNN with Pre-Convolved Input</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -554,7 +645,7 @@ Test accuracy     :  0.9415692821368948
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cnn.html" title="Convolutional Neural Network with Pre-Convolved Input"
+          <a href="cnn.html" title="A Simple CNN with Pre-Convolved Input"
              >next</a> |</li>
         <li class="right" >
           <a href="softmax.html" title="Softmax Classifier"

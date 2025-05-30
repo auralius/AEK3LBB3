@@ -1,0 +1,61 @@
+Traceback (most recent call last):
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+%matplotlib inline
+
+baboon = np.int32(image.imread('./baboon.png') * 255.0)
+print("image dimension:", baboon.shape)
+
+plt.imshow(baboon)
+plt.show()
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+Cell [0;32mIn[11], line 3[0m
+[1;32m      1[0m get_ipython()[38;5;241m.[39mrun_line_magic([38;5;124m'[39m[38;5;124mmatplotlib[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124minline[39m[38;5;124m'[39m)
+[0;32m----> 3[0m baboon [38;5;241m=[39m np[38;5;241m.[39mint32([43mimage[49m[38;5;241;43m.[39;49m[43mimread[49m[43m([49m[38;5;124;43m'[39;49m[38;5;124;43m./baboon.png[39;49m[38;5;124;43m'[39;49m[43m)[49m [38;5;241m*[39m [38;5;241m255.0[39m)
+[1;32m      4[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mimage dimension:[39m[38;5;124m"[39m, baboon[38;5;241m.[39mshape)
+[1;32m      6[0m plt[38;5;241m.[39mimshow(baboon)
+
+File [0;32m~/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/matplotlib/image.py:1544[0m, in [0;36mimread[0;34m(fname, format)[0m
+[1;32m   1537[0m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(fname, [38;5;28mstr[39m) [38;5;129;01mand[39;00m [38;5;28mlen[39m(parse[38;5;241m.[39murlparse(fname)[38;5;241m.[39mscheme) [38;5;241m>[39m [38;5;241m1[39m:
+[1;32m   1538[0m     [38;5;66;03m# Pillow doesn't handle URLs directly.[39;00m
+[1;32m   1539[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m   1540[0m         [38;5;124m"[39m[38;5;124mPlease open the URL for reading and pass the [39m[38;5;124m"[39m
+[1;32m   1541[0m         [38;5;124m"[39m[38;5;124mresult to Pillow, e.g. with [39m[38;5;124m"[39m
+[1;32m   1542[0m         [38;5;124m"[39m[38;5;124m``np.array(PIL.Image.open(urllib.request.urlopen(url)))``.[39m[38;5;124m"[39m
+[1;32m   1543[0m         )
+[0;32m-> 1544[0m [38;5;28;01mwith[39;00m [43mimg_open[49m[43m([49m[43mfname[49m[43m)[49m [38;5;28;01mas[39;00m image:
+[1;32m   1545[0m     [38;5;28;01mreturn[39;00m (_pil_png_to_float_array(image)
+[1;32m   1546[0m             [38;5;28;01mif[39;00m [38;5;28misinstance[39m(image, PIL[38;5;241m.[39mPngImagePlugin[38;5;241m.[39mPngImageFile) [38;5;28;01melse[39;00m
+[1;32m   1547[0m             pil_to_array(image))
+
+File [0;32m~/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/PIL/ImageFile.py:126[0m, in [0;36mImageFile.__init__[0;34m(self, fp, filename)[0m
+[1;32m    122[0m [38;5;28mself[39m[38;5;241m.[39mdecodermaxblock [38;5;241m=[39m MAXBLOCK
+[1;32m    124[0m [38;5;28;01mif[39;00m is_path(fp):
+[1;32m    125[0m     [38;5;66;03m# filename[39;00m
+[0;32m--> 126[0m     [38;5;28mself[39m[38;5;241m.[39mfp [38;5;241m=[39m [38;5;28;43mopen[39;49m[43m([49m[43mfp[49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mrb[39;49m[38;5;124;43m"[39;49m[43m)[49m
+[1;32m    127[0m     [38;5;28mself[39m[38;5;241m.[39mfilename [38;5;241m=[39m fp
+[1;32m    128[0m     [38;5;28mself[39m[38;5;241m.[39m_exclusive_fp [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: './baboon.png'
+

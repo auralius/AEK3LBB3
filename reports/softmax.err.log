@@ -1,0 +1,68 @@
+Traceback (most recent call last):
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/auralius/miniconda3/envs/py.3.12.4/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+classifier = Softmax()
+loss_hist = classifier.train(X_train, Y_train, learning_rate=1e-5, batch_size=None, num_iters=100000, verbose_step=10000)
+------------------
+
+----- stdout -----
+iteration 0 / 100000: loss 2.294566
+----- stdout -----
+iteration 10000 / 100000: loss 0.798415
+----- stdout -----
+iteration 20000 / 100000: loss 0.690310
+----- stdout -----
+iteration 30000 / 100000: loss 0.669566
+----- stdout -----
+iteration 40000 / 100000: loss 0.663711
+----- stdout -----
+iteration 50000 / 100000: loss 0.661629
+----- stdout -----
+iteration 60000 / 100000: loss 0.660757
+----- stdout -----
+iteration 70000 / 100000: loss 0.660347
+----- stdout -----
+iteration 80000 / 100000: loss 0.660139
+----- stdout -----
+iteration 90000 / 100000: loss 0.660027
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mKeyboardInterrupt[0m                         Traceback (most recent call last)
+Cell [0;32mIn[11], line 2[0m
+[1;32m      1[0m classifier [38;5;241m=[39m Softmax()
+[0;32m----> 2[0m loss_hist [38;5;241m=[39m [43mclassifier[49m[38;5;241;43m.[39;49m[43mtrain[49m[43m([49m[43mX_train[49m[43m,[49m[43m [49m[43mY_train[49m[43m,[49m[43m [49m[43mlearning_rate[49m[38;5;241;43m=[39;49m[38;5;241;43m1e-5[39;49m[43m,[49m[43m [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[38;5;28;43;01mNone[39;49;00m[43m,[49m[43m [49m[43mnum_iters[49m[38;5;241;43m=[39;49m[38;5;241;43m100000[39;49m[43m,[49m[43m [49m[43mverbose_step[49m[38;5;241;43m=[39;49m[38;5;241;43m10000[39;49m[43m)[49m
+
+Cell [0;32mIn[2], line 148[0m, in [0;36mSoftmax.train[0;34m(self, X, Y, learning_rate, reg, num_iters, batch_size, verbose, verbose_step)[0m
+[1;32m    146[0m   loss, grad [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39msoftmax_loss_vectorized([38;5;28mself[39m[38;5;241m.[39mW, X_batch, y_batch, reg)
+[1;32m    147[0m [38;5;28;01melse[39;00m:
+[0;32m--> 148[0m   loss, grad [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43msoftmax_loss_vectorized[49m[43m([49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mW[49m[43m,[49m[43m [49m[43mX[49m[43m,[49m[43m [49m[43mY[49m[43m,[49m[43m [49m[43mreg[49m[43m)[49m
+[1;32m    150[0m loss_history[38;5;241m.[39mappend(loss)
+[1;32m    152[0m [38;5;66;03m# Update the weights using the gradient and the learning rate.          [39;00m
+
+Cell [0;32mIn[2], line 94[0m, in [0;36mSoftmax.softmax_loss_vectorized[0;34m(W, X, Y, reg)[0m
+[1;32m     92[0m expF [38;5;241m=[39m np[38;5;241m.[39mexp(F)
+[1;32m     93[0m softmax [38;5;241m=[39m expF[38;5;241m/[39mnp[38;5;241m.[39msum(expF, axis[38;5;241m=[39m[38;5;241m1[39m)[38;5;241m.[39mreshape([38;5;241m-[39m[38;5;241m1[39m,[38;5;241m1[39m) 
+[0;32m---> 94[0m loss [38;5;241m=[39m np[38;5;241m.[39msum([38;5;241m-[39mnp[38;5;241m.[39mlog([43msoftmax[49m[43m[[49m[38;5;28;43mrange[39;49m[43m([49m[43mN[49m[43m)[49m[43m,[49m[43mY[49m[43m][49m)) [38;5;241m/[39m N [38;5;241m+[39m reg [38;5;241m*[39m np[38;5;241m.[39msum(W [38;5;241m*[39m W)
+[1;32m     96[0m [38;5;66;03m# derivative of the loss[39;00m
+[1;32m     97[0m softmax[[38;5;28mrange[39m(N), Y] [38;5;241m-[39m[38;5;241m=[39m [38;5;241m1[39m                  [38;5;66;03m# update the softmax table[39;00m
+
+[0;31mKeyboardInterrupt[0m: 
+

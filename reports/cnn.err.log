@@ -18,39 +18,29 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import os
+hidden_size = 40
 
-f1 = "./X_train_conv.txt"
-f2 = "./X_test_conv.txt"
-
-if os.path.exists(f1):
-    os.remove(f1)
-
-if os.path.exists(f2):
-    os.remove(f2)
-
-with open(f1, "ab") as f:
-    for x in X_train_paded:
-        img_out = convolve_image(x.reshape(16,16), [2,2], 2)
-        #img_out = convolve_flattened_image(x.flatten(), 18, 18, [2,2], 2)
-        np.savetxt(f, img_out.reshape(1,-1), fmt="%i", delimiter=',', newline='\n')
-
-with open(f2, "ab") as f:
-    for x in X_test_padded:
-        img_out = convolve_image(x.reshape(16,16), [2,2], 2)
-        #img_out = convolve_flattened_image(x.flatten(), 18, 18, [2,2], 2)
-        np.savetxt(f, img_out.reshape(1,-1), fmt="%i", delimiter=',', newline='\n')
+net = TwoLayerNet(input_size, hidden_size, num_classes)
+stats = net.train(X_train_conv, Y_train, reg=0.02, gtol=1e-3, maxiter=200, verbose=False)
 ------------------
 
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mValueError[0m                                Traceback (most recent call last)
-Cell [0;32mIn[6], line 14[0m
-[1;32m     12[0m [38;5;28;01mwith[39;00m [38;5;28mopen[39m(f1, [38;5;124m"[39m[38;5;124mab[39m[38;5;124m"[39m) [38;5;28;01mas[39;00m f:
-[1;32m     13[0m     [38;5;28;01mfor[39;00m x [38;5;129;01min[39;00m X_train_paded:
-[0;32m---> 14[0m         img_out [38;5;241m=[39m convolve_image([43mx[49m[38;5;241;43m.[39;49m[43mreshape[49m[43m([49m[38;5;241;43m16[39;49m[43m,[49m[38;5;241;43m16[39;49m[43m)[49m, [[38;5;241m2[39m,[38;5;241m2[39m], [38;5;241m2[39m)
-[1;32m     15[0m         [38;5;66;03m#img_out = convolve_flattened_image(x.flatten(), 18, 18, [2,2], 2)[39;00m
-[1;32m     16[0m         np[38;5;241m.[39msavetxt(f, img_out[38;5;241m.[39mreshape([38;5;241m1[39m,[38;5;241m-[39m[38;5;241m1[39m), fmt[38;5;241m=[39m[38;5;124m"[39m[38;5;132;01m%i[39;00m[38;5;124m"[39m, delimiter[38;5;241m=[39m[38;5;124m'[39m[38;5;124m,[39m[38;5;124m'[39m, newline[38;5;241m=[39m[38;5;124m'[39m[38;5;130;01m\n[39;00m[38;5;124m'[39m)
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[14], line 4[0m
+[1;32m      1[0m hidden_size [38;5;241m=[39m [38;5;241m40[39m
+[1;32m      3[0m net [38;5;241m=[39m TwoLayerNet(input_size, hidden_size, num_classes)
+[0;32m----> 4[0m stats [38;5;241m=[39m [43mnet[49m[38;5;241;43m.[39;49m[43mtrain[49m[43m([49m[43mX_train_conv[49m[43m,[49m[43m [49m[43mY_train[49m[43m,[49m[43m [49m[43mreg[49m[38;5;241;43m=[39;49m[38;5;241;43m0.02[39;49m[43m,[49m[43m [49m[43mgtol[49m[38;5;241;43m=[39;49m[38;5;241;43m1e-3[39;49m[43m,[49m[43m [49m[43mmaxiter[49m[38;5;241;43m=[39;49m[38;5;241;43m200[39;49m[43m,[49m[43m [49m[43mverbose[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m
 
-[0;31mValueError[0m: cannot reshape array of size 324 into shape (16,16)
+Cell [0;32mIn[6], line 141[0m, in [0;36mTwoLayerNet.train[0;34m(self, X, Y, reg, gtol, maxiter, verbose)[0m
+[1;32m    135[0m     [38;5;28;01mreturn[39;00m loss
+[1;32m    137[0m x0 [38;5;241m=[39m np[38;5;241m.[39mhstack(([38;5;28mself[39m[38;5;241m.[39mparams[[38;5;124m'[39m[38;5;124mW1[39m[38;5;124m'[39m][38;5;241m.[39mflatten(), 
+[1;32m    138[0m                 [38;5;28mself[39m[38;5;241m.[39mparams[[38;5;124m'[39m[38;5;124mb1[39m[38;5;124m'[39m], 
+[1;32m    139[0m                 [38;5;28mself[39m[38;5;241m.[39mparams[[38;5;124m'[39m[38;5;124mW2[39m[38;5;124m'[39m][38;5;241m.[39mflatten(), 
+[1;32m    140[0m                 [38;5;28mself[39m[38;5;241m.[39mparams[[38;5;124m'[39m[38;5;124mb2[39m[38;5;124m'[39m]))
+[0;32m--> 141[0m res [38;5;241m=[39m [43mminimize[49m(obj, x0, method[38;5;241m=[39m[38;5;124m'[39m[38;5;124mL-BFGS-B[39m[38;5;124m'[39m, jac[38;5;241m=[39m[38;5;28;01mTrue[39;00m, options[38;5;241m=[39m{[38;5;124m'[39m[38;5;124mgtol[39m[38;5;124m'[39m: gtol, [38;5;124m'[39m[38;5;124mmaxiter[39m[38;5;124m'[39m: maxiter, [38;5;124m'[39m[38;5;124mdisp[39m[38;5;124m'[39m: [38;5;28;01mTrue[39;00m})
+[1;32m    143[0m [38;5;28mself[39m[38;5;241m.[39mparams[[38;5;124m"[39m[38;5;124mW1[39m[38;5;124m"[39m] [38;5;241m=[39m res[38;5;241m.[39mx[[38;5;241m0[39m: D[38;5;241m*[39mH][38;5;241m.[39mreshape(D,H)
+[1;32m    144[0m [38;5;28mself[39m[38;5;241m.[39mparams[[38;5;124m"[39m[38;5;124mb1[39m[38;5;124m"[39m] [38;5;241m=[39m res[38;5;241m.[39mx[D[38;5;241m*[39mH: D[38;5;241m*[39mH[38;5;241m+[39mH]
+
+[0;31mNameError[0m: name 'minimize' is not defined
 

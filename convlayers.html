@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Convolutional Layers &#8212; AEK3LBB3</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/traditional.css?v=608ddc6c" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="LeNet-1 with Keras (and PyTorch)" href="lenet1.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="lenet1.html" title="LeNet-1 with Keras (and PyTorch)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Convolutional Layers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="convolutional-layers">
+<h1>Convolutional Layers<a class="headerlink" href="#convolutional-layers" title="Link to this heading">¶</a></h1>
+<section id="preparations">
+<h2>Preparations<a class="headerlink" href="#preparations" title="Link to this heading">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">image</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;sans-serif&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="single-image-convolution">
+<h2>Single Image Convolution<a class="headerlink" href="#single-image-convolution" title="Link to this heading">¶</a></h2>
+<p>A convolution is done by multiplying a pixel’s and its neighboring pixels color value by a matrix (kernel matrix).</p>
+<p>Here, we implement a convolution function for a single image. The implemenation is as follows, where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">img_in</span></code> is the image as a 2D matrix</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kernel</span></code> is the filter kernel matrix</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> is the stride number</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">convolve</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+    <span class="n">F</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">nr</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="o">=</span> <span class="n">img_in</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nr</span> <span class="o">-</span> <span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="n">S</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nc</span> <span class="o">-</span> <span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="n">S</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span>
+    
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">)])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+            <span class="n">img_out</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">kernel</span> <span class="o">*</span> <span class="n">img_in</span><span class="p">[</span><span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">+</span><span class="n">F</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span><span class="n">c</span><span class="o">+</span><span class="n">F</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">img_out</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Typically, when <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">1</span></code>, the dimension should not change. This is possible if the image has been previously padded. For a <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">x</span> <span class="pre">3</span></code> filter matrix, we need 1 layer of padding. For a <code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">x</span> <span class="pre">5</span></code> filter matrix, we will need two layes of padding. However, if the filter dimensions are even numbers, we will not be able to apply uniform padding. Check <a class="reference external" href="https://d2l.ai/chapter_convolutional-neural-networks/padding-and-strides.html">this material</a> for more infomation.</p>
+</section>
+<section id="single-image-pooling">
+<h2>Single Image Pooling<a class="headerlink" href="#single-image-pooling" title="Link to this heading">¶</a></h2>
+<p>Pooling is a downsampling technique used in convolutional neural networks (CNNs) to reduce spatial dimensions of feature maps while preserving important features. It achieves this by selecting the maximum/mean value within each small, overlapping region (or “window”) of the feature map.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">maxpool</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+    <span class="n">nr</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="o">=</span> <span class="n">img_in</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nr</span> <span class="o">-</span> <span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="n">S</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nc</span> <span class="o">-</span> <span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="n">S</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span>
+    
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">)])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+            <span class="n">img_out</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img_in</span><span class="p">[</span><span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">+</span><span class="n">F</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span><span class="n">c</span><span class="o">+</span><span class="n">F</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">img_out</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">meanpool</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+    <span class="n">nr</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="o">=</span> <span class="n">img_in</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nr</span> <span class="o">-</span> <span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="n">S</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nc</span> <span class="o">-</span> <span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="n">S</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span>
+    
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">)])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+            <span class="n">img_out</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">img_in</span><span class="p">[</span><span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">+</span><span class="n">F</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span><span class="n">c</span><span class="o">+</span><span class="n">F</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">img_out</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="single-image-normalization">
+<h2>Single Image Normalization<a class="headerlink" href="#single-image-normalization" title="Link to this heading">¶</a></h2>
+<p>This is a simple min-max normalization. This process causes the pixel values to range from 0 to 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">img_in</span><span class="p">):</span>
+    <span class="n">min_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">img_in</span><span class="p">)</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img_in</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">img_in</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_val</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="batch-convolution">
+<h2>Batch Convolution<a class="headerlink" href="#batch-convolution" title="Link to this heading">¶</a></h2>
+<p>Batch convolution involves:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code> images with a dimension of <code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">x</span> <span class="pre">H</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">x</span> <span class="pre">O</span></code> filters with a kernel spatial dimension of <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">x</span> <span class="pre">F</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> (stride number)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">P</span></code> (padding layer number)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">batch_convolve</span><span class="p">(</span><span class="n">input3d</span><span class="p">,</span> <span class="n">filter4d</span><span class="p">,</span> <span class="n">bias1d</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Volumetric matrix is addressed by using 3 indices: [first index, second index, third index]</span>
+    <span class="c1"># Depth is represented first index</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">I</span> <span class="o">=</span> <span class="n">input3d</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span>
+    <span class="n">F</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="n">filter4d</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span>
+    
+    <span class="c1"># Do ZERO padding</span>
+    <span class="n">input3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">input3d</span><span class="p">,</span> <span class="p">((</span><span class="n">P</span><span class="p">,</span> <span class="n">P</span><span class="p">),</span> <span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">P</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+
+    <span class="n">W2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">W</span> <span class="o">-</span> <span class="n">F</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">P</span><span class="p">)</span> <span class="o">/</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">H2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">H</span> <span class="o">-</span> <span class="n">F</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">P</span><span class="p">)</span> <span class="o">/</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>  
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
+
+    <span class="n">output3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">W2</span><span class="p">,</span> <span class="n">H2</span><span class="p">,</span> <span class="n">O</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">O</span><span class="p">):</span>
+        <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">o</span><span class="p">]</span> <span class="o">+</span> <span class="n">bias1d</span><span class="p">[</span><span class="n">o</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">I</span><span class="p">):</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">input3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span>
+            <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">o</span><span class="p">]</span> <span class="o">+</span> <span class="n">convolve</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">filter4d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">o</span><span class="p">],</span> <span class="n">S</span><span class="o">=</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output3d</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="batch-pooling">
+<h2>Batch Pooling<a class="headerlink" href="#batch-pooling" title="Link to this heading">¶</a></h2>
+<p>Batch pooling involves:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code> images with a dimension of <code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">x</span> <span class="pre">H</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">F</span></code> (spatial dimension)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> (stride number)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">batch_maxpool</span><span class="p">(</span><span class="n">input3d</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">input3d</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span>
+
+    <span class="n">W2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">W</span> <span class="o">-</span> <span class="n">F</span><span class="p">)</span> <span class="o">/</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">H2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">H</span> <span class="o">-</span> <span class="n">F</span><span class="p">)</span> <span class="o">/</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">D2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+
+    <span class="n">output3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">W2</span><span class="p">,</span> <span class="n">H2</span><span class="p">,</span> <span class="n">D2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">d2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">D2</span><span class="p">):</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">input3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">d2</span><span class="p">]</span>
+        <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">d2</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxpool</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output3d</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">batch_meanpool</span><span class="p">(</span><span class="n">input3d</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">input3d</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span>
+
+    <span class="n">W2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">W</span> <span class="o">-</span> <span class="n">F</span><span class="p">)</span> <span class="o">/</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">H2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">H</span> <span class="o">-</span> <span class="n">F</span><span class="p">)</span> <span class="o">/</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">D2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+
+    <span class="n">output3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">W2</span><span class="p">,</span> <span class="n">H2</span><span class="p">,</span> <span class="n">D2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">d2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">D2</span><span class="p">):</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">input3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">d2</span><span class="p">]</span>
+        <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">d2</span><span class="p">]</span> <span class="o">=</span> <span class="n">meanpool</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output3d</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="batch-normalization">
+<h2>Batch Normalization<a class="headerlink" href="#batch-normalization" title="Link to this heading">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">batch_normalization</span><span class="p">(</span><span class="n">input3d</span><span class="p">):</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">input3d</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span>
+    <span class="n">output3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+        <span class="n">output3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">input3d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">d</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">output3d</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="relu-activation">
+<h2>ReLU Activation<a class="headerlink" href="#relu-activation" title="Link to this heading">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ReLU</span><span class="p">(</span><span class="n">input3d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">input3d</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="demonstrations">
+<h2>Demonstrations<a class="headerlink" href="#demonstrations" title="Link to this heading">¶</a></h2>
+<section id="batch-convolution-of-an-image">
+<h3>Batch Convolution of an Image<a class="headerlink" href="#batch-convolution-of-an-image" title="Link to this heading">¶</a></h3>
+<p>For the demonstration, we will load a colored image (3 channels). We will first need to re-arrange the image matrix such that it is in the desired format, which is: <code class="docutils literal notranslate"><span class="pre">[Depth</span> <span class="pre">x</span> <span class="pre">Width</span> <span class="pre">x</span> <span class="pre">Height]</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">baboon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;./baboon.png&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;image dimension:&quot;</span><span class="p">,</span> <span class="n">baboon</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">baboon</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>image dimension: (512, 512, 3)
+</pre></div>
+</div>
+<img alt="_images/f81a6050dda6616b424aae01b5c84cc953a31ee74e7274047e7a7efe88bb09fd.png" src="_images/f81a6050dda6616b424aae01b5c84cc953a31ee74e7274047e7a7efe88bb09fd.png" />
+</div>
+</div>
+<p>Show the images separately.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">baboon</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/bfda5b72489d3c478b9f60191b953bbf264d9517dd99a3013d41a0895aab6639.png" src="_images/bfda5b72489d3c478b9f60191b953bbf264d9517dd99a3013d41a0895aab6639.png" />
+</div>
+</div>
+<p>Let’s apply <code class="docutils literal notranslate"><span class="pre">(3</span> <span class="pre">x</span> <span class="pre">3</span> <span class="pre">x</span> <span class="pre">3</span> <span class="pre">x</span> <span class="pre">2)</span></code> arbitrary filters:</p>
+<ul class="simple">
+<li><p>filter kernel dimesion: <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">x</span> <span class="pre">3</span></code></p></li>
+<li><p>number of inputs: <code class="docutils literal notranslate"><span class="pre">3</span></code></p></li>
+<li><p>number of outputs: <code class="docutils literal notranslate"><span class="pre">2</span></code></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="n">F</span><span class="p">[:,:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0625</span><span class="p">,</span> <span class="mf">0.125</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">],</span>
+                         <span class="p">[</span><span class="mf">0.125</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.125</span><span class="p">],</span>
+                         <span class="p">[</span><span class="mf">0.0625</span><span class="p">,</span> <span class="mf">0.125</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">]])</span>
+
+<span class="n">F</span><span class="p">[:,:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">]])</span>
+
+<span class="n">F</span><span class="p">[:,:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">F</span><span class="p">[:,:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                         <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">F</span><span class="p">[:,:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">F</span><span class="p">[:,:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                         <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+
+
+<span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">batch_convolve</span><span class="p">(</span><span class="n">baboon</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">batch_meanpool</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">batch_normalization</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Rescale the weights to be between 0 and 255</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">output</span><span class="p">[:,:,</span> <span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ec8859041693155b75952326b8ac9b34c3891732b98a01029394c1b1cee92893.png" src="_images/ec8859041693155b75952326b8ac9b34c3891732b98a01029394c1b1cee92893.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the input image&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">baboon</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the output image&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shape of the input image
+(512, 512, 3)
+Shape of the output image
+(256, 256, 2)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="lenet-1">
+<h3>LeNet-1<a class="headerlink" href="#lenet-1" title="Link to this heading">¶</a></h3>
+<p><img alt="" src="_images/lenet-1.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">h5py</span>
+<span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s2">&quot;./datasets/usps/usps.h5&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hf</span><span class="p">:</span>
+    <span class="n">x_train</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">)[:])</span> 
+
+    <span class="n">x_test</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span>
+    <span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">)[:])</span> 
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 256
+Number of data    : 7291
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Peforming reshaping operation</span>
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">x_test</span> <span class="o">=</span> <span class="n">x_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/edb5be48247f1d64b36bc1e01418f6d7f702e38fcb044a8749e5efd155131db6.png" src="_images/edb5be48247f1d64b36bc1e01418f6d7f702e38fcb044a8749e5efd155131db6.png" />
+</div>
+</div>
+<p>We have pretrained the network in <a class="reference internal" href="lenet1.html"><span class="std std-doc">lenet1.ipynb</span></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-1.npy&#39;</span><span class="p">)</span>
+<span class="n">w2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-2.npy&#39;</span><span class="p">)</span>
+<span class="n">w3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-3.npy&#39;</span><span class="p">)</span>
+<span class="n">w4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-4.npy&#39;</span><span class="p">)</span>
+<span class="n">w5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-5.npy&#39;</span><span class="p">)</span>
+<span class="n">w6</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-6.npy&#39;</span><span class="p">)</span>
+<span class="n">w7</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-7.npy&#39;</span><span class="p">)</span>
+<span class="n">w8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-8.npy&#39;</span><span class="p">)</span>
+<span class="n">w9</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-9.npy&#39;</span><span class="p">)</span>
+<span class="n">w10</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-10.npy&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(2007, 16, 16, 1)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_predict</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">output1</span> <span class="o">=</span> <span class="n">batch_convolve</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">output2</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(</span><span class="n">output1</span><span class="p">)</span>
+    <span class="n">output3</span> <span class="o">=</span> <span class="n">batch_maxpool</span><span class="p">(</span><span class="n">output2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">output4</span> <span class="o">=</span> <span class="n">batch_convolve</span><span class="p">(</span><span class="n">output3</span><span class="p">,</span> <span class="n">w3</span><span class="p">,</span> <span class="n">w4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">output5</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(</span><span class="n">output4</span><span class="p">)</span>
+    <span class="n">output6</span> <span class="o">=</span> <span class="n">batch_maxpool</span><span class="p">(</span><span class="n">output5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">output7</span> <span class="o">=</span> <span class="n">output6</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">output7</span> <span class="o">=</span> <span class="n">output7</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">192</span><span class="p">)</span>
+
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">output7</span> <span class="o">@</span> <span class="n">w5</span> <span class="o">+</span> <span class="n">w6</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span>
+    <span class="n">y3</span> <span class="o">=</span> <span class="n">y2</span> <span class="o">@</span> <span class="n">w7</span> <span class="o">+</span> <span class="n">w8</span>
+    <span class="n">y4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y3</span><span class="p">)</span>
+    <span class="n">y5</span> <span class="o">=</span> <span class="n">y4</span> <span class="o">@</span> <span class="n">w9</span> <span class="o">+</span> <span class="n">w10</span>
+    <span class="n">y_predict</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y5</span><span class="p">))</span>
+
+<span class="n">y_predict</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_predict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Predict on the validation set</span>
+<span class="n">val_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_predict</span> <span class="o">==</span> <span class="n">y_test</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Validation accuracy : &#39;</span><span class="p">,</span> <span class="n">val_acc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Validation accuracy :  0.953662182361734
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "py.3.12.4"
+        },
+        kernelOptions: {
+            name: "py.3.12.4",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'py.3.12.4'</script>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="intro.html">
+              <img class="logo" src="_static/logo.png" alt="Logo of Project name not set"/>
+            </a></p>
+  <div>
+    <h3><a href="intro.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Convolutional Layers</a><ul>
+<li><a class="reference internal" href="#preparations">Preparations</a></li>
+<li><a class="reference internal" href="#single-image-convolution">Single Image Convolution</a></li>
+<li><a class="reference internal" href="#single-image-pooling">Single Image Pooling</a></li>
+<li><a class="reference internal" href="#single-image-normalization">Single Image Normalization</a></li>
+<li><a class="reference internal" href="#batch-convolution">Batch Convolution</a></li>
+<li><a class="reference internal" href="#batch-pooling">Batch Pooling</a></li>
+<li><a class="reference internal" href="#batch-normalization">Batch Normalization</a></li>
+<li><a class="reference internal" href="#relu-activation">ReLU Activation</a></li>
+<li><a class="reference internal" href="#demonstrations">Demonstrations</a><ul>
+<li><a class="reference internal" href="#batch-convolution-of-an-image">Batch Convolution of an Image</a></li>
+<li><a class="reference internal" href="#lenet-1">LeNet-1</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="lenet1.html"
+                          title="previous chapter">LeNet-1 with Keras (and PyTorch)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/convlayers.ipynb"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="lenet1.html" title="LeNet-1 with Keras (and PyTorch)"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="intro.html">AEK3LBB3</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Convolutional Layers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    </div>
+  </body>
+</html>
