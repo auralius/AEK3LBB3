@@ -166,12 +166,14 @@
 </section>
 <section id="batch-convolution">
 <h2>Batch Convolution<a class="headerlink" href="#batch-convolution" title="Link to this heading">¶</a></h2>
-<p>Batch convolution involves:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code> images with a dimension of <code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">x</span> <span class="pre">H</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">x</span> <span class="pre">O</span></code> filters with a kernel spatial dimension of <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">x</span> <span class="pre">F</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> (stride number)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">P</span></code> (padding layer number)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">I</span></code>: number of the input images, the dimensions of all images are  <code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">x</span> <span class="pre">H</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">O</span></code>: number of output images</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">x</span> <span class="pre">O</span></code>: number of the convolution filters (kernels)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">x</span> <span class="pre">F</span></code>: dimension of the kernels</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code>: stride length</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">P</span></code>: number of padding layers</p></li>
+<li><p>The dimension of the output images are <code class="docutils literal notranslate"><span class="pre">W2</span> <span class="pre">x</span> <span class="pre">H2</span></code>, where: <code class="docutils literal notranslate"><span class="pre">W2</span> <span class="pre">=</span> <span class="pre">(W</span> <span class="pre">-</span> <span class="pre">F</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">P)</span> <span class="pre">/</span> <span class="pre">S</span> <span class="pre">+</span> <span class="pre">1)</span></code> and <code class="docutils literal notranslate"><span class="pre">H2</span> <span class="pre">=</span> <span class="pre">(H</span> <span class="pre">-</span> <span class="pre">F</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">P)</span> <span class="pre">/</span> <span class="pre">S</span> <span class="pre">+</span> <span class="pre">1)</span></code></p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -208,8 +210,8 @@
 <p>Batch pooling involves:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">D</span></code> images with a dimension of <code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">x</span> <span class="pre">H</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">F</span></code> (spatial dimension)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> (stride number)</p></li>
+<li><p>a pooling filter of <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">x</span> <span class="pre">F</span></code></p></li>
+<li><p>a stride length of <code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -269,12 +271,16 @@
 </div>
 </div>
 </section>
-<section id="relu-activation">
-<h2>ReLU Activation<a class="headerlink" href="#relu-activation" title="Link to this heading">¶</a></h2>
+<section id="activations">
+<h2>Activations<a class="headerlink" href="#activations" title="Link to this heading">¶</a></h2>
+<p><img alt="" src="_images/activations.png" /></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ReLU</span><span class="p">(</span><span class="n">input3d</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">input3d</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">LeakyReLU</span><span class="p">(</span><span class="n">input3d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">input3d</span><span class="p">,</span> <span class="n">input3d</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -284,8 +290,8 @@
 <section id="demonstrations">
 <h2>Demonstrations<a class="headerlink" href="#demonstrations" title="Link to this heading">¶</a></h2>
 <section id="batch-convolution-of-an-image">
-<h3>Batch Convolution of an Image<a class="headerlink" href="#batch-convolution-of-an-image" title="Link to this heading">¶</a></h3>
-<p>For the demonstration, we will load a colored image (3 channels). We will first need to re-arrange the image matrix such that it is in the desired format, which is: <code class="docutils literal notranslate"><span class="pre">[Depth</span> <span class="pre">x</span> <span class="pre">Width</span> <span class="pre">x</span> <span class="pre">Height]</span></code>.</p>
+<h3>1. Batch Convolution of an Image<a class="headerlink" href="#batch-convolution-of-an-image" title="Link to this heading">¶</a></h3>
+<p>For the demonstration, we will load a colored image (3 channels).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
@@ -305,7 +311,7 @@
 <img alt="_images/f81a6050dda6616b424aae01b5c84cc953a31ee74e7274047e7a7efe88bb09fd.png" src="_images/f81a6050dda6616b424aae01b5c84cc953a31ee74e7274047e7a7efe88bb09fd.png" />
 </div>
 </div>
-<p>Show the images separately.</p>
+<p>For the sake of clarity, let us plot the loaded image as three different grayscale images</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
@@ -384,30 +390,13 @@
 <img alt="_images/ec8859041693155b75952326b8ac9b34c3891732b98a01029394c1b1cee92893.png" src="_images/ec8859041693155b75952326b8ac9b34c3891732b98a01029394c1b1cee92893.png" />
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the input image&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">baboon</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the output image&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shape of the input image
-(512, 512, 3)
-Shape of the output image
-(256, 256, 2)
-</pre></div>
-</div>
-</div>
-</div>
 </section>
 <hr class="docutils" />
 <section id="lenet-1">
-<h3>LeNet-1<a class="headerlink" href="#lenet-1" title="Link to this heading">¶</a></h3>
+<h3>2. LeNet-1<a class="headerlink" href="#lenet-1" title="Link to this heading">¶</a></h3>
+<p>The following picture is the LeNet-1 layer architecture diagram.</p>
 <p><img alt="" src="_images/lenet-1.png" /></p>
+<p>First, we load the USPS datasets. There are two sets of data: training data and testing data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">h5py</span>
@@ -418,14 +407,24 @@ Shape of the output image
     <span class="n">x_test</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span>
     <span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">)[:])</span> 
 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training data:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Testing data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dimension numbers :&quot;</span><span class="p">,</span> <span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data    :&quot;</span><span class="p">,</span> <span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dimension numbers : 256
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training data:
+Dimension numbers : 256
 Number of data    : 7291
+
+Testing data:
+Dimension numbers : 256
+Number of data    : 2007
 </pre></div>
 </div>
 </div>
@@ -453,49 +452,45 @@ Number of data    : 7291
 <img alt="_images/edb5be48247f1d64b36bc1e01418f6d7f702e38fcb044a8749e5efd155131db6.png" src="_images/edb5be48247f1d64b36bc1e01418f6d7f702e38fcb044a8749e5efd155131db6.png" />
 </div>
 </div>
-<p>We have pretrained the network in <a class="reference internal" href="lenet1.html"><span class="std std-doc">lenet1.ipynb</span></a>.</p>
+<p>Next, we also load all weight matrices and bias vectors from the previously trained network as found in <a class="reference internal" href="lenet1.html"><span class="std std-doc">lenet1.ipynb</span></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-1.npy&#39;</span><span class="p">)</span>
-<span class="n">w2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-2.npy&#39;</span><span class="p">)</span>
-<span class="n">w3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-3.npy&#39;</span><span class="p">)</span>
-<span class="n">w4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-4.npy&#39;</span><span class="p">)</span>
-<span class="n">w5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-5.npy&#39;</span><span class="p">)</span>
-<span class="n">w6</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-6.npy&#39;</span><span class="p">)</span>
-<span class="n">w7</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-7.npy&#39;</span><span class="p">)</span>
-<span class="n">w8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-8.npy&#39;</span><span class="p">)</span>
-<span class="n">w9</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-9.npy&#39;</span><span class="p">)</span>
-<span class="n">w10</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-10.npy&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w1</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-1.npy&#39;</span><span class="p">)</span>  <span class="c1"># weight</span>
+<span class="n">w2</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-2.npy&#39;</span><span class="p">)</span>  <span class="c1"># bias</span>
+<span class="n">w3</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-3.npy&#39;</span><span class="p">)</span>  <span class="c1"># weight</span>
+<span class="n">w4</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-4.npy&#39;</span><span class="p">)</span>  <span class="c1"># bias</span>
+<span class="n">w5</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-5.npy&#39;</span><span class="p">)</span>  <span class="c1"># weight</span>
+<span class="n">w6</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-6.npy&#39;</span><span class="p">)</span>  <span class="c1"># bias</span>
+<span class="n">w7</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-7.npy&#39;</span><span class="p">)</span>  <span class="c1"># weight</span>
+<span class="n">w8</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-8.npy&#39;</span><span class="p">)</span>  <span class="c1"># bias</span>
+<span class="n">w9</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-9.npy&#39;</span><span class="p">)</span>  <span class="c1"># weight</span>
+<span class="n">w10</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./datasets/usps/weight-10.npy&#39;</span><span class="p">)</span> <span class="c1"># bias</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(2007, 16, 16, 1)
-</pre></div>
-</div>
-</div>
-</div>
+<p>We then tranlsate the layer architecture diagram into actual codes.</p>
+<p>The sequential order of the CNN is as follows:</p>
+<p><code class="docutils literal notranslate"><span class="pre">input</span> <span class="pre">--&gt;</span> <span class="pre">C1</span> <span class="pre">--&gt;</span> <span class="pre">reLU</span> <span class="pre">--&gt;</span> <span class="pre">M1</span> <span class="pre">--&gt;</span> <span class="pre">C2</span> <span class="pre">--&gt;</span> <span class="pre">ReLU</span> <span class="pre">--&gt;</span> <span class="pre">M2</span> <span class="pre">--&gt;</span> <span class="pre">FCN</span></code></p>
+<p>where C and M are convolutional and max-pooling layers, respectively. FCN is a fully-connected network layer.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_predict</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="c1"># C1</span>
     <span class="n">output1</span> <span class="o">=</span> <span class="n">batch_convolve</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">output2</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(</span><span class="n">output1</span><span class="p">)</span>
+    <span class="c1"># M1</span>
     <span class="n">output3</span> <span class="o">=</span> <span class="n">batch_maxpool</span><span class="p">(</span><span class="n">output2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># C2</span>
     <span class="n">output4</span> <span class="o">=</span> <span class="n">batch_convolve</span><span class="p">(</span><span class="n">output3</span><span class="p">,</span> <span class="n">w3</span><span class="p">,</span> <span class="n">w4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">output5</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(</span><span class="n">output4</span><span class="p">)</span>
+    <span class="c1"># M2</span>
     <span class="n">output6</span> <span class="o">=</span> <span class="n">batch_maxpool</span><span class="p">(</span><span class="n">output5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
+    <span class="c1"># FCN</span>
     <span class="n">output7</span> <span class="o">=</span> <span class="n">output6</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="n">output7</span> <span class="o">=</span> <span class="n">output7</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">192</span><span class="p">)</span>
-
     <span class="n">y1</span> <span class="o">=</span> <span class="n">output7</span> <span class="o">@</span> <span class="n">w5</span> <span class="o">+</span> <span class="n">w6</span>
     <span class="n">y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span>
     <span class="n">y3</span> <span class="o">=</span> <span class="n">y2</span> <span class="o">@</span> <span class="n">w7</span> <span class="o">+</span> <span class="n">w8</span>
@@ -508,6 +503,7 @@ Number of data    : 7291
 </div>
 </div>
 </div>
+<p>Do predictions by using the loaded weights and check the accuracy.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Predict on the validation set</span>
@@ -566,10 +562,10 @@ Number of data    : 7291
 <li><a class="reference internal" href="#batch-convolution">Batch Convolution</a></li>
 <li><a class="reference internal" href="#batch-pooling">Batch Pooling</a></li>
 <li><a class="reference internal" href="#batch-normalization">Batch Normalization</a></li>
-<li><a class="reference internal" href="#relu-activation">ReLU Activation</a></li>
+<li><a class="reference internal" href="#activations">Activations</a></li>
 <li><a class="reference internal" href="#demonstrations">Demonstrations</a><ul>
-<li><a class="reference internal" href="#batch-convolution-of-an-image">Batch Convolution of an Image</a></li>
-<li><a class="reference internal" href="#lenet-1">LeNet-1</a></li>
+<li><a class="reference internal" href="#batch-convolution-of-an-image">1. Batch Convolution of an Image</a></li>
+<li><a class="reference internal" href="#lenet-1">2. LeNet-1</a></li>
 </ul>
 </li>
 </ul>
